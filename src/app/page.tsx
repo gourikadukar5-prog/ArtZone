@@ -70,15 +70,32 @@ export default function HomePage() {
     <div className="bg-cream dark:bg-charcoal-950 min-h-screen pt-24 font-sans text-charcoal-900 dark:text-warm-100 transition-colors duration-300">
       
       {/* ══ HERO SECTION (Google Arts Inspired) ══ */}
-      <AnimatedSection className="section container-wide text-center">
-        <motion.h1 variants={fadeUp} custom={0} className="font-display font-semibold text-5xl md:text-7xl mb-6 max-w-4xl mx-auto tracking-tight">
-          What inspires your creativity?
-        </motion.h1>
-        <motion.p variants={fadeUp} custom={1} className="text-lg text-charcoal-500 dark:text-charcoal-400 max-w-2xl mx-auto mb-16 leading-relaxed">
-          Explore beautiful sketches, mandala arts, anime arts, digital paintings, and creative artworks from talented artists around the world.
-        </motion.p>
+      <AnimatedSection className="relative section container-wide text-center overflow-hidden py-24 rounded-3xl mt-4 mb-20 shadow-lg border border-warm-200/50 dark:border-charcoal-800/50">
         
-        {/* Overlapping Cards */}
+        {/* Video Background */}
+        <div className="absolute inset-0 z-0 overflow-hidden rounded-3xl">
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            className="w-full h-full object-cover"
+          >
+            <source src="/hero-bg.mp4" type="video/mp4" />
+          </video>
+          {/* Overlay to ensure text readability */}
+          <div className="absolute inset-0 bg-cream/80 dark:bg-charcoal-950/80 backdrop-blur-[2px]" />
+        </div>
+
+        <div className="relative z-10">
+          <motion.h1 variants={fadeUp} custom={0} className="font-display font-semibold text-5xl md:text-7xl mb-6 max-w-4xl mx-auto tracking-tight">
+            What inspires your creativity?
+          </motion.h1>
+          <motion.p variants={fadeUp} custom={1} className="text-lg text-charcoal-900 font-medium dark:text-warm-100 max-w-2xl mx-auto mb-16 leading-relaxed">
+            Explore beautiful sketches, mandala arts, anime arts, digital paintings, and creative artworks from talented artists around the world.
+          </motion.p>
+          
+          {/* Overlapping Cards */}
         <div className="relative h-[450px] md:h-[600px] w-full max-w-6xl mx-auto flex items-center justify-center">
           {HERO_CATEGORIES.map((cat, i) => (
             <motion.div
@@ -104,6 +121,7 @@ export default function HomePage() {
               </div>
             </motion.div>
           ))}
+        </div>
         </div>
       </AnimatedSection>
 
