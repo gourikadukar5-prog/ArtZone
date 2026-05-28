@@ -7,6 +7,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { Search, Menu, X, Bell, User, Sun, Moon, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Pacifico, Lilita_One } from "next/font/google";
+
+const pacifico = Pacifico({ weight: "400", subsets: ["latin"] });
+const lilita = Lilita_One({ weight: "400", subsets: ["latin"] });
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -61,43 +65,13 @@ export function Navbar() {
           {/* Logo */}
           <Link
             href="/"
-            className="relative z-10 flex items-center gap-3 group"
+            className="relative z-10 flex items-center group"
           >
-            {/* Gold AZ Monogram (matching image) */}
-            <div 
-              className="w-11 h-10 rounded-sm flex items-center justify-center shadow-md relative overflow-hidden transition-transform duration-300 group-hover:scale-105" 
-              style={{ backgroundColor: '#A9832A' }}
-            >
-              {/* Using CSS text-shadow to create the overlapping cutout effect between A and Z */}
-              <span 
-                className="absolute text-white font-serif font-bold text-[28px] -ml-4 z-10" 
-                style={{ 
-                  fontFamily: 'Georgia, serif',
-                  textShadow: '2px 2px 0 #A9832A, 2px -1px 0 #A9832A', 
-                  transform: 'scaleY(1.1) scaleX(0.95)'
-                }}
-              >
-                A
-              </span>
-              <span 
-                className="absolute text-white font-serif font-bold text-[28px] ml-3 z-0" 
-                style={{ 
-                  fontFamily: 'Georgia, serif',
-                  transform: 'scaleY(1.1) scaleX(1.05)'
-                }}
-              >
-                Z
-              </span>
-            </div>
-            
-            {/* Text Wordmark */}
-            <div className="flex items-baseline hidden sm:flex">
-              <span className="text-xl font-bold tracking-tight text-charcoal-900 dark:text-white" style={{ fontFamily: 'Georgia, serif' }}>
-                Art
-              </span>
-              <span className="text-xl font-light tracking-wide text-charcoal-500 dark:text-charcoal-300" style={{ fontFamily: 'Arial, sans-serif' }}>
-                Zone
-              </span>
+            <div className="flex items-baseline text-[36px] text-[#FF1493] transition-transform duration-300 group-hover:scale-105 tracking-tight drop-shadow-sm">
+              <span className={lilita.className} style={{ display: 'inline-block', transform: 'rotate(-2deg)' }}>A</span>
+              <span className={pacifico.className} style={{ marginLeft: '-3px' }}>rt</span>
+              <span className={lilita.className} style={{ marginLeft: '2px', marginRight: '-2px' }}>Z</span>
+              <span className={pacifico.className}>one</span>
             </div>
           </Link>
 
