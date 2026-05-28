@@ -60,7 +60,7 @@ export default function DashboardPage() {
                 Welcome back, Gouri
               </h1>
               <p className="text-charcoal-500 dark:text-charcoal-400 text-sm">
-                Here's what's happening with your art today.
+                Here&apos;s what&apos;s happening with your art today.
               </p>
             </div>
             <button 
@@ -186,7 +186,7 @@ export default function DashboardPage() {
                 ))
               ) : (
                 <div className="col-span-full py-12 text-center text-charcoal-500">
-                  You haven't uploaded any artworks yet.
+                  You haven&apos;t uploaded any artworks yet.
                 </div>
               )}
             </div>

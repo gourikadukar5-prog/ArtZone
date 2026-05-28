@@ -109,7 +109,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/20 to-transparent" />
         <div className="absolute bottom-16 left-16 right-16">
           <p className="font-display text-2xl text-warm-100 italic leading-snug">
-            "Art is not what you see, but what you make others see."
+            &quot;Art is not what you see, but what you make others see.&quot;
           </p>
           <p className="text-charcoal-400 mt-4 text-sm font-medium tracking-widest uppercase">
             — Edgar Degas
