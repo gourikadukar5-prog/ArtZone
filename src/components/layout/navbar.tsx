@@ -61,18 +61,31 @@ export function Navbar() {
           {/* Logo */}
           <Link
             href="/"
-            className="relative z-10 flex items-center gap-2 group"
+            className="relative z-10 flex items-center gap-3 group"
           >
-            <div className="w-9 h-9 rounded-lg logo-bg-wavy border border-charcoal-700/30 flex items-center justify-center transition-transform duration-300 group-hover:rotate-3 shadow-md overflow-hidden relative">
-              {/* Subtle light overlay for reflection */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
-              <span className="logo-gold text-sm font-bold font-display tracking-widest translate-x-0.5">
-                AZ
-              </span>
+            {/* Multi-style AZ Icon */}
+            <div className="flex items-center -space-x-2 transition-transform duration-300 group-hover:scale-105">
+              {/* Pinterest-inspired 'A' */}
+              <div className="w-9 h-9 rounded-full bg-[#E60023] flex items-center justify-center shadow-md relative z-10 border-2 border-white dark:border-charcoal-950">
+                <span className="text-white text-lg font-bold italic" style={{ fontFamily: 'Georgia, serif', paddingRight: '2px' }}>A</span>
+              </div>
+              {/* Microsoft-inspired 'Z' */}
+              <div className="w-9 h-9 rounded-lg bg-[#00A4EF] flex items-center justify-center shadow-md relative z-0 border-2 border-white dark:border-charcoal-950">
+                <span className="text-white text-lg font-black tracking-tighter" style={{ fontFamily: 'Arial, sans-serif' }}>Z</span>
+              </div>
             </div>
-            <span className="font-display font-semibold text-lg tracking-tight text-charcoal-900 dark:text-warm-100 transition-colors">
-              ArtZone
-            </span>
+            
+            {/* Text Wordmark */}
+            <div className="flex items-baseline hidden sm:flex">
+              <span className="text-xl font-bold tracking-tight text-charcoal-900 dark:text-white" style={{ fontFamily: 'Georgia, serif' }}>
+                Art
+              </span>
+              <span className="text-xl font-light tracking-wide text-charcoal-500 dark:text-charcoal-300" style={{ fontFamily: 'Arial, sans-serif' }}>
+                Zone
+              </span>
+              {/* Google-inspired dot */}
+              <span className="w-1.5 h-1.5 rounded-full bg-[#FBBC05] ml-1 mb-1"></span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
