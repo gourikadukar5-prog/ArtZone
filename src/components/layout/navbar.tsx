@@ -63,16 +63,31 @@ export function Navbar() {
             href="/"
             className="relative z-10 flex items-center gap-3 group"
           >
-            {/* Multi-style AZ Icon */}
-            <div className="flex items-center -space-x-2 transition-transform duration-300 group-hover:scale-105">
-              {/* Pinterest-inspired 'A' */}
-              <div className="w-9 h-9 rounded-full bg-[#E60023] flex items-center justify-center shadow-md relative z-10 border-2 border-white dark:border-charcoal-950">
-                <span className="text-white text-lg font-bold italic" style={{ fontFamily: 'Georgia, serif', paddingRight: '2px' }}>A</span>
-              </div>
-              {/* Microsoft-inspired 'Z' */}
-              <div className="w-9 h-9 rounded-lg bg-[#00A4EF] flex items-center justify-center shadow-md relative z-0 border-2 border-white dark:border-charcoal-950">
-                <span className="text-white text-lg font-black tracking-tighter" style={{ fontFamily: 'Arial, sans-serif' }}>Z</span>
-              </div>
+            {/* Gold AZ Monogram (matching image) */}
+            <div 
+              className="w-11 h-10 rounded-sm flex items-center justify-center shadow-md relative overflow-hidden transition-transform duration-300 group-hover:scale-105" 
+              style={{ backgroundColor: '#A9832A' }}
+            >
+              {/* Using CSS text-shadow to create the overlapping cutout effect between A and Z */}
+              <span 
+                className="absolute text-white font-serif font-bold text-[28px] -ml-4 z-10" 
+                style={{ 
+                  fontFamily: 'Georgia, serif',
+                  textShadow: '2px 2px 0 #A9832A, 2px -1px 0 #A9832A', 
+                  transform: 'scaleY(1.1) scaleX(0.95)'
+                }}
+              >
+                A
+              </span>
+              <span 
+                className="absolute text-white font-serif font-bold text-[28px] ml-3 z-0" 
+                style={{ 
+                  fontFamily: 'Georgia, serif',
+                  transform: 'scaleY(1.1) scaleX(1.05)'
+                }}
+              >
+                Z
+              </span>
             </div>
             
             {/* Text Wordmark */}
@@ -83,8 +98,6 @@ export function Navbar() {
               <span className="text-xl font-light tracking-wide text-charcoal-500 dark:text-charcoal-300" style={{ fontFamily: 'Arial, sans-serif' }}>
                 Zone
               </span>
-              {/* Google-inspired dot */}
-              <span className="w-1.5 h-1.5 rounded-full bg-[#FBBC05] ml-1 mb-1"></span>
             </div>
           </Link>
 
