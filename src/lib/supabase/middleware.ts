@@ -41,20 +41,10 @@ export async function updateSession(request: NextRequest) {
   // refreshing the auth token
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Route protection logic
+  // Only redirect authenticated users away from login/signup pages
   const isAuthRoute = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup')
-  const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard')
-
-  if (isProtectedRoute && !user) {
-    // Redirect unauthenticated users to login, maintaining their intended destination
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    url.searchParams.set('next', request.nextUrl.pathname)
-    return NextResponse.redirect(url)
-  }
 
   if (isAuthRoute && user) {
-    // Redirect authenticated users away from auth pages
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
