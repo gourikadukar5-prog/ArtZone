@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { PenTool, Upload, Trash2 } from "lucide-react";
 import { useArtStore } from "@/lib/store";
-import { UploadModal } from "@/components/dashboard/UploadModal";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -24,7 +22,6 @@ export default function SketchesPage() {
   const artworks = useArtStore((state) => state.artworks);
   const removeArtwork = useArtStore((state) => state.removeArtwork);
   const sketchArtworks = artworks.filter((a) => a.category === "sketch");
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-cream text-charcoal-900 pt-24 pb-32">
@@ -66,13 +63,13 @@ export default function SketchesPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.45, duration: 0.6 }}
           >
-            <button
-              onClick={() => setIsUploadOpen(true)}
+            <Link
+              href="/upload"
               className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full btn-primary font-medium transition-all duration-400 active:scale-[0.98]"
             >
               <Upload className="w-4 h-4" />
               Upload Your Sketch
-            </button>
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -91,13 +88,13 @@ export default function SketchesPage() {
             <p className="text-charcoal-500 text-sm mb-6 max-w-xs">
               Be the first to share a sketch. Upload your drawings and inspire the community.
             </p>
-            <button
-              onClick={() => setIsUploadOpen(true)}
+            <Link
+              href="/upload"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-charcoal-900 text-warm-100 text-sm font-medium hover:opacity-90 transition-opacity"
             >
               <Upload className="w-4 h-4" />
               Upload Sketch
-            </button>
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
@@ -151,8 +148,6 @@ export default function SketchesPage() {
           </div>
         )}
       </section>
-
-      <UploadModal isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} defaultCategory="sketch" />
     </div>
   );
 }

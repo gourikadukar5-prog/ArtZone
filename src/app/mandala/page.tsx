@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Sparkles, Upload, Trash2 } from "lucide-react";
 import { useArtStore } from "@/lib/store";
-import { UploadModal } from "@/components/dashboard/UploadModal";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -21,10 +19,8 @@ const fadeUp = {
 };
 
 export default function MandalaPage() {
-  const artworks = useArtStore((state) => state.artworks);
+  const artworks = useArtStore((state) => state.artworks).filter((a) => a.category === "mandala");
   const removeArtwork = useArtStore((state) => state.removeArtwork);
-  const mandalaArtworks = artworks.filter((a) => a.category === "mandala");
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-charcoal-950 text-warm-100 pt-24 pb-32">
@@ -66,20 +62,20 @@ export default function MandalaPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.45, duration: 0.6 }}
           >
-            <button
-              onClick={() => setIsUploadOpen(true)}
+            <Link
+              href="/upload"
               className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border border-charcoal-600 text-warm-300 text-sm font-medium transition-all duration-400 hover:bg-warm-100 hover:text-charcoal-900 hover:border-warm-100 active:scale-[0.98]"
             >
               <Upload className="w-4 h-4" />
               Upload Your Mandala
-            </button>
+            </Link>
           </motion.div>
         </div>
       </section>
 
       {/* ── Mandala Grid ── */}
       <section className="container-wide">
-        {mandalaArtworks.length === 0 ? (
+        {artworks.length === 0 ? (
           /* Empty state */
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="w-24 h-24 rounded-full border-2 border-dashed border-charcoal-700 flex items-center justify-center mb-6">
@@ -91,17 +87,17 @@ export default function MandalaPage() {
             <p className="text-charcoal-500 text-sm mb-6 max-w-xs">
               Be the first to share a mandala. Upload your intricate artwork and inspire the community.
             </p>
-            <button
-              onClick={() => setIsUploadOpen(true)}
+            <Link
+              href="/upload"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-warm-100 text-charcoal-900 text-sm font-medium hover:bg-white transition-colors"
             >
               <Upload className="w-4 h-4" />
               Upload Mandala
-            </button>
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
-            {mandalaArtworks.map((artwork, i) => (
+            {artworks.map((artwork, i) => (
               <motion.div
                 key={artwork.id}
                 custom={i}
@@ -161,8 +157,6 @@ export default function MandalaPage() {
           </div>
         )}
       </section>
-
-      <UploadModal isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} defaultCategory="mandala" />
     </div>
   );
 }

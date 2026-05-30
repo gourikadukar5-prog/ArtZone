@@ -7,7 +7,7 @@ import { LayoutDashboard, Image as ImageIcon, FolderHeart, Heart, BarChart3, Set
 import { formatNumber, cn } from "@/lib/utils";
 import { useArtStore } from "@/lib/store";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const SIDEBAR_ITEMS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },

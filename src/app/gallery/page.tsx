@@ -7,7 +7,6 @@ import Masonry from "react-masonry-css";
 import { Search, Heart, Upload, Trash2 } from "lucide-react";
 import { formatNumber, cn } from "@/lib/utils";
 import { useArtStore } from "@/lib/store";
-import { UploadModal } from "@/components/dashboard/UploadModal";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -29,7 +28,6 @@ export default function GalleryPage() {
   const removeArtwork = useArtStore((state) => state.removeArtwork);
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
 
   const filteredArtworks = artworks.filter((artwork) => {
     const matchesCategory =
@@ -78,13 +76,13 @@ export default function GalleryPage() {
               />
             </div>
             {/* Upload button right on gallery page too */}
-            <button
-              onClick={() => setIsUploadOpen(true)}
+            <Link
+              href="/upload"
               className="btn-primary py-2.5 px-5 flex-shrink-0"
             >
               <Upload className="w-4 h-4" />
               Upload
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -123,13 +121,13 @@ export default function GalleryPage() {
             <p className="text-charcoal-500 dark:text-charcoal-400 text-sm mb-6">
               Try a different search or upload your first artwork.
             </p>
-            <button
-              onClick={() => setIsUploadOpen(true)}
+            <Link
+              href="/upload"
               className="btn-primary"
             >
               <Upload className="w-4 h-4" />
               Upload Artwork
-            </button>
+            </Link>
           </div>
         ) : (
           <Masonry
@@ -202,9 +200,6 @@ export default function GalleryPage() {
           </Masonry>
         )}
       </section>
-
-      {/* Upload Modal */}
-      <UploadModal isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} />
     </div>
   );
 }
