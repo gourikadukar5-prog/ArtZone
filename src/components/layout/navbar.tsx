@@ -5,9 +5,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
-import { Search, Menu, X, Bell, User, Sun, Moon, LogIn } from "lucide-react";
+import { Search, Menu, X, Bell, User, Sun, Moon, LogIn, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Pacifico, Lilita_One } from "next/font/google";
+import { useArtStore } from "@/lib/store";
+import { createClient } from "@/lib/supabase/client";
 
 const pacifico = Pacifico({ weight: "400", subsets: ["latin"] });
 const lilita = Lilita_One({ weight: "400", subsets: ["latin"] });
@@ -16,7 +18,6 @@ const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Explore", href: "/#explore" },
   { label: "Gallery", href: "/gallery" },
-  { label: "Upload Art", href: "/dashboard" },
   { label: "Community", href: "/gallery" }, // Using gallery as placeholder for Community
 ];
 
@@ -29,12 +30,21 @@ export function Navbar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
+  const { isAuthenticated, user, setUser } = useArtStore();
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
     }
+  };
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setUser(null);
+    router.push('/');
   };
 
   useEffect(() => {
@@ -91,6 +101,19 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            {isAuthenticated && (
+              <Link
+                href="/upload"
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
+                  pathname === "/upload"
+                    ? "text-charcoal-900 bg-white shadow-sm"
+                    : "text-charcoal-500 hover:text-charcoal-900 hover:bg-white/50"
+                )}
+              >
+                Upload Art
+              </Link>
+            )}
           </div>
 
           {/* Right Actions */}
@@ -132,31 +155,53 @@ export function Navbar() {
               <Bell className="w-4 h-4" />
             </button>
 
-            {/* Login / Sign Up */}
+            {/* Auth Area */}
             <div className="hidden lg:flex items-center gap-2 ml-2 border-l border-warm-200 dark:border-charcoal-800 pl-4">
-              <Link
-                href="/login"
-                className="flex items-center gap-2 text-sm font-medium text-charcoal-600 dark:text-charcoal-400 hover:text-charcoal-900 dark:hover:text-warm-100 transition-colors"
-              >
-                <LogIn className="w-4 h-4" />
-                Log in
-              </Link>
-              <Link
-                href="/signup"
-                className="px-4 py-2 text-sm font-medium rounded-full bg-charcoal-900 text-white hover:bg-charcoal-800 dark:bg-warm-100 dark:text-charcoal-900 dark:hover:bg-white transition-all shadow-sm ml-2"
-              >
-                Sign up
-              </Link>
+              {!isAuthenticated ? (
+                <>
+                  <Link
+                    href="/login"
+                    className="flex items-center gap-2 text-sm font-medium text-charcoal-600 dark:text-charcoal-400 hover:text-charcoal-900 dark:hover:text-warm-100 transition-colors"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Log in
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="px-4 py-2 text-sm font-medium rounded-full bg-charcoal-900 text-white hover:bg-charcoal-800 dark:bg-warm-100 dark:text-charcoal-900 dark:hover:bg-white transition-all shadow-sm ml-2"
+                  >
+                    Sign up
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="flex items-center gap-2 text-sm font-medium text-charcoal-600 dark:text-charcoal-400 hover:text-charcoal-900 dark:hover:text-warm-100 transition-colors"
+                  >
+                    <User className="w-4 h-4" />
+                    <span className="truncate max-w-[100px]">{user?.user_metadata?.full_name || 'Dashboard'}</span>
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 text-sm font-medium text-red-500 hover:text-red-700 transition-colors ml-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </>
+              )}
             </div>
 
-            {/* User Profile */}
-            <Link
-              href="/dashboard"
-              className="lg:hidden p-2.5 rounded-full text-charcoal-600 hover:bg-white transition-colors shadow-sm bg-white/40 backdrop-blur-sm ml-1"
-              aria-label="Profile"
-            >
-              <User className="w-4 h-4" />
-            </Link>
+            {/* Mobile User Profile (only if auth) */}
+            {isAuthenticated && (
+              <Link
+                href="/dashboard"
+                className="lg:hidden p-2.5 rounded-full text-charcoal-600 dark:text-charcoal-400 hover:bg-white dark:hover:bg-charcoal-800 transition-colors shadow-sm bg-white/40 dark:bg-charcoal-900/40 backdrop-blur-sm ml-1"
+                aria-label="Profile"
+              >
+                <User className="w-4 h-4" />
+              </Link>
+            )}
 
             {/* Mobile Menu Toggle */}
             <button
@@ -210,6 +255,45 @@ export function Navbar() {
                     {link.label}
                   </Link>
                 ))}
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      href="/upload"
+                      className={cn(
+                        "px-4 py-3 rounded-xl text-base font-medium transition-colors",
+                        pathname === "/upload"
+                          ? "bg-white text-charcoal-900 shadow-sm"
+                          : "text-charcoal-600 hover:bg-white/50"
+                      )}
+                    >
+                      Upload Art
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsMobileOpen(false);
+                      }}
+                      className="px-4 py-3 rounded-xl text-base font-medium text-left text-red-500 hover:bg-white/50 transition-colors"
+                    >
+                      Log out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="px-4 py-3 rounded-xl text-base font-medium text-charcoal-600 hover:bg-white/50 transition-colors"
+                    >
+                      Log in
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="px-4 py-3 rounded-xl text-base font-medium bg-charcoal-900 text-white dark:bg-warm-100 dark:text-charcoal-900 mt-2 text-center"
+                    >
+                      Sign up
+                    </Link>
+                  </>
+                )}
               </div>
             </motion.div>
           </motion.div>

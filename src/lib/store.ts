@@ -19,6 +19,10 @@ interface ArtStore {
   artworks: Artwork[];
   // IDs of user-uploaded artworks (so we don't lose them across refreshes)
   userUploadIds: string[];
+  // Auth state
+  user: any | null;
+  isAuthenticated: boolean;
+  setUser: (user: any | null) => void;
   addArtwork: (artwork: Omit<Artwork, 'id' | 'likes' | 'comments' | 'saves' | 'createdAt' | 'artist'>) => void;
   removeArtwork: (id: string) => void;
 }
@@ -28,6 +32,10 @@ export const useArtStore = create<ArtStore>()(
     (set, get) => ({
       artworks: [...DEMO_ARTWORKS],
       userUploadIds: [],
+      user: null,
+      isAuthenticated: false,
+
+      setUser: (user) => set({ user, isAuthenticated: !!user }),
 
       addArtwork: (newArt) => set((state) => {
         const artwork: Artwork = {
@@ -37,7 +45,11 @@ export const useArtStore = create<ArtStore>()(
           comments: 0,
           saves: 0,
           createdAt: new Date().toISOString(),
-          artist: { name: "Gouri", username: "gouri", avatar: "" }
+          artist: { 
+            name: state.user?.user_metadata?.full_name || "Anonymous", 
+            username: state.user?.user_metadata?.full_name?.toLowerCase().replace(/\s+/g, '') || "anon", 
+            avatar: state.user?.user_metadata?.avatar_url || "" 
+          }
         };
         return {
           artworks: [artwork, ...state.artworks],

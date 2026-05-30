@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { AuthProvider } from "@/components/providers/auth-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { ConditionalFooter } from "@/components/layout/conditional-footer";
 import { Toaster } from "sonner";
@@ -67,12 +68,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange={false}
         >
-          <div className="relative min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <ConditionalFooter />
-          </div>
-          <Toaster position="bottom-right" theme="system" />
+          <AuthProvider>
+            <div className="relative min-h-screen flex flex-col">
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <ConditionalFooter />
+            </div>
+            <Toaster position="bottom-right" theme="system" />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

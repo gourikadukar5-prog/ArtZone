@@ -6,7 +6,8 @@ import { motion } from "framer-motion";
 import { LayoutDashboard, Image as ImageIcon, FolderHeart, Heart, BarChart3, Settings, Plus, Trash2 } from "lucide-react";
 import { formatNumber, cn } from "@/lib/utils";
 import { useArtStore } from "@/lib/store";
-import { UploadModal } from "@/components/dashboard/UploadModal";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const SIDEBAR_ITEMS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -18,13 +19,24 @@ const SIDEBAR_ITEMS = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   
-  const artworks = useArtStore((state) => state.artworks);
-  const removeArtwork = useArtStore((state) => state.removeArtwork);
-  // Show user's own artworks (we use "Gouri" as the default logged in user for demo)
-  const myArtworks = artworks.filter(a => a.artist.name === "Gouri");
+  const { artworks, removeArtwork, user, isAuthenticated } = useArtStore();
+
+  useEffect(() => {
+    setMounted(true);
+    if (mounted && !isAuthenticated) {
+      router.replace("/login?next=/dashboard");
+    }
+  }, [isAuthenticated, mounted, router]);
+
+  // Use the actual logged-in user's name, fallback to "Gouri" only if metadata is missing (should not happen)
+  const userName = user?.user_metadata?.full_name || "Gouri";
+  const myArtworks = artworks.filter(a => a.artist.name === userName || a.artist.name === "Anonymous");
+
+  if (!mounted || !isAuthenticated) return null; // Wait for auth redirect
 
   return (
     <div className="min-h-screen bg-cream dark:bg-charcoal-950 pt-[var(--nav-height)] flex">
@@ -57,19 +69,19 @@ export default function DashboardPage() {
           <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <h1 className="font-display font-semibold text-3xl text-charcoal-900 dark:text-warm-100 mb-2">
-                Welcome back, Gouri
+                Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || "Artist"}
               </h1>
               <p className="text-charcoal-500 dark:text-charcoal-400 text-sm">
                 Here&apos;s what&apos;s happening with your art today.
               </p>
             </div>
-            <button 
-              onClick={() => setIsUploadModalOpen(true)}
-              className="btn-primary py-2.5"
+            <Link 
+              href="/upload"
+              className="btn-primary py-2.5 inline-flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               Upload Artwork
-            </button>
+            </Link>
           </header>
 
           {/* Overview Content */}
@@ -201,11 +213,6 @@ export default function DashboardPage() {
           )}
         </div>
       </main>
-
-      <UploadModal 
-        isOpen={isUploadModalOpen} 
-        onClose={() => setIsUploadModalOpen(false)} 
-      />
     </div>
   );
 }
