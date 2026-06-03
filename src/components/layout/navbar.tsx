@@ -27,11 +27,25 @@ const AUTH_ROUTES = ["/login", "/signup", "/forgot-password"];
 
 function ArtZoneLogo() {
   return (
-    <div className="flex items-baseline text-[36px] text-[#FF1493] transition-transform duration-300 group-hover:scale-105 tracking-tight drop-shadow-sm">
-      <span className={lilita.className} style={{ display: "inline-block", transform: "rotate(-2deg)" }}>A</span>
-      <span className={pacifico.className} style={{ marginLeft: "-3px" }}>rt</span>
-      <span className={lilita.className} style={{ marginLeft: "2px", marginRight: "-2px" }}>Z</span>
-      <span className={pacifico.className}>one</span>
+    <div className="flex items-center gap-2">
+      {/* AZ Icon */}
+      <svg viewBox="0 0 56 48" className="w-9 h-8 flex-shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* A — circle base + triangle beam */}
+        <circle cx="10" cy="36" r="7" fill="#D4A853" />
+        <polygon points="22,22 32,6 46,42 32,42" fill="#D4A853" />
+        {/* Z — three slanted bars */}
+        <rect x="36" y="6"  width="18" height="7" rx="1" fill="white" transform="rotate(-12 36 6)" />
+        <rect x="33" y="19" width="18" height="7" rx="1" fill="white" transform="rotate(-12 33 19)" />
+        <rect x="30" y="32" width="18" height="7" rx="1" fill="white" transform="rotate(-12 30 32)" />
+      </svg>
+
+      {/* ArtZone text */}
+      <div className="flex items-baseline leading-none">
+        <span className={lilita.className} style={{ fontSize: "28px", color: "#D4A853", display: "inline-block", transform: "rotate(-2deg)" }}>A</span>
+        <span className={pacifico.className} style={{ fontSize: "26px", color: "#D4A853", marginLeft: "-2px" }}>rt</span>
+        <span className={lilita.className} style={{ fontSize: "28px", color: "white", marginLeft: "3px", marginRight: "-2px" }}>Z</span>
+        <span className={pacifico.className} style={{ fontSize: "26px", color: "white" }}>one</span>
+      </div>
     </div>
   );
 }
