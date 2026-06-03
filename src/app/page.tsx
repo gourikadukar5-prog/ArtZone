@@ -196,7 +196,7 @@ export default function HomePage() {
           <div className="relative z-10 text-center max-w-2xl mx-auto">
             <h2 className="font-display font-bold text-4xl md:text-5xl text-charcoal-900 dark:text-warm-100 mb-6">Share your creativity with the world.</h2>
             <p className="text-charcoal-600 dark:text-charcoal-400 text-lg mb-10">Upload your artwork and inspire thousands of art lovers across the globe.</p>
-            <Link href="/dashboard" className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full bg-charcoal-900 text-white dark:bg-warm-100 dark:text-charcoal-900 font-medium hover:bg-charcoal-800 dark:hover:bg-white transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 duration-300">
+            <Link href="/upload" className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full bg-charcoal-900 text-white dark:bg-warm-100 dark:text-charcoal-900 font-medium hover:bg-charcoal-800 dark:hover:bg-white transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 duration-300">
               <UploadCloud className="w-5 h-5" />
               Upload Your Art
             </Link>

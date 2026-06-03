@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") || "/dashboard";
 
   useEffect(() => {
     const supabase = createClient();
@@ -16,7 +18,7 @@ export default function AuthCallbackPage() {
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (session) {
-        router.replace("/dashboard");
+        router.replace(next);
         return;
       }
 
@@ -24,7 +26,7 @@ export default function AuthCallbackPage() {
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
         if (event === "SIGNED_IN" && session) {
           subscription.unsubscribe();
-          router.replace("/dashboard");
+          router.replace(next);
         } else if (event === "SIGNED_OUT" || (!session && event !== "INITIAL_SESSION")) {
           subscription.unsubscribe();
           router.replace("/auth/auth-code-error");
@@ -39,7 +41,7 @@ export default function AuthCallbackPage() {
     };
 
     handleCallback();
-  }, [router]);
+  }, [router, next]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-transparent gap-4">
@@ -48,5 +50,17 @@ export default function AuthCallbackPage() {
         Completing sign in...
       </p>
     </div>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center bg-transparent gap-4">
+        <div className="w-10 h-10 rounded-full border-4 border-[#FF1493] border-t-transparent animate-spin" />
+      </div>
+    }>
+      <AuthCallbackContent />
+    </Suspense>
   );
 }

@@ -1,17 +1,26 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
+import { useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+function LoginContent() {
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
+
   const handleGoogleLogin = async () => {
     const supabase = createClient();
+    const redirectTo = next 
+      ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` 
+      : `${window.location.origin}/auth/callback`;
+      
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo,
       },
     });
   };
@@ -100,5 +109,13 @@ export default function LoginPage() {
           </p>
       </motion.div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-transparent" />}>
+      <LoginContent />
+    </Suspense>
   );
 }
