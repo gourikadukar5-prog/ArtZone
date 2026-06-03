@@ -20,7 +20,7 @@ export default function ArtworkDetailPage({ params }: { params: { id: string } }
   ).slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-cream dark:bg-charcoal-950 pt-[var(--nav-height)] pb-24">
+    <div className="min-h-screen bg-transparent pt-[var(--nav-height)] pb-24">
       {/* Top Nav Bar */}
       <div className="border-b border-warm-200 dark:border-charcoal-800 bg-white/50 dark:bg-charcoal-900/50 backdrop-blur-md sticky top-[var(--nav-height)] z-40">
         <div className="container-wide h-14 flex items-center justify-between">
@@ -59,7 +59,7 @@ export default function ArtworkDetailPage({ params }: { params: { id: string } }
               transition={{ duration: 0.6 }}
               className="art-frame bg-white dark:bg-charcoal-900 rounded-3xl shadow-sm border border-warm-200 dark:border-charcoal-800 overflow-hidden relative"
             >
-              <div className="w-full flex items-center justify-center bg-warm-100 dark:bg-charcoal-950 min-h-[40vh]">
+              <div className="w-full flex items-center justify-center bg-transparent min-h-[40vh]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={artwork.imageUrl}

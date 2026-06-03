@@ -50,7 +50,7 @@ export default function GalleryPage() {
   };
 
   return (
-    <div className="pt-24 min-h-screen pb-24 bg-cream dark:bg-charcoal-950">
+    <div className="pt-24 min-h-screen pb-24 bg-transparent">
       {/* ── Page Header ── */}
       <section className="container-wide mb-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-8">

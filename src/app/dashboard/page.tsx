@@ -39,7 +39,7 @@ export default function DashboardPage() {
   if (!mounted || !isAuthenticated) return null; // Wait for auth redirect
 
   return (
-    <div className="min-h-screen bg-cream dark:bg-charcoal-950 pt-[var(--nav-height)] flex">
+    <div className="min-h-screen bg-transparent pt-[var(--nav-height)] flex">
       {/* Sidebar */}
       <aside className="w-64 fixed top-[var(--nav-height)] bottom-0 left-0 border-r border-warm-200 dark:border-charcoal-800 bg-white/50 dark:bg-charcoal-900/50 backdrop-blur-md hidden md:flex flex-col p-6">
         <div className="flex-1 space-y-2">

@@ -67,26 +67,11 @@ export default function HomePage() {
   };
 
   return (
-    <div className="bg-cream dark:bg-charcoal-950 min-h-screen pt-24 font-sans text-charcoal-900 dark:text-warm-100 transition-colors duration-300">
+    <div className="bg-transparent min-h-screen pt-24 font-sans text-charcoal-900 dark:text-warm-100 transition-colors duration-300">
       
       {/* ══ HERO SECTION (Google Arts Inspired) ══ */}
-      <AnimatedSection className="relative section container-wide text-center overflow-hidden py-24 rounded-3xl mt-4 mb-20 shadow-lg border border-warm-200/50 dark:border-charcoal-800/50">
+      <AnimatedSection className="relative section container-wide text-center py-24 mt-4 mb-20">
         
-        {/* Video Background */}
-        <div className="absolute inset-0 z-0 overflow-hidden rounded-3xl">
-          <video 
-            autoPlay 
-            loop 
-            muted 
-            playsInline 
-            className="w-full h-full object-cover"
-          >
-            <source src="/new-hero-bg.mp4" type="video/mp4" />
-          </video>
-          {/* Overlay to ensure text readability */}
-          <div className="absolute inset-0 bg-cream/80 dark:bg-charcoal-950/80 backdrop-blur-[2px]" />
-        </div>
-
         <div className="relative z-10">
           <motion.h1 variants={fadeUp} custom={0} className="font-display font-semibold text-5xl md:text-7xl mb-6 max-w-4xl mx-auto tracking-tight">
             What inspires your creativity?

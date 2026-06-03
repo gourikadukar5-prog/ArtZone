@@ -17,7 +17,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-cream dark:bg-charcoal-950">
+    <div className="min-h-screen flex bg-transparent">
       {/* Left side: Form */}
       <div className="flex-1 flex flex-col justify-center px-8 sm:px-16 lg:px-24 pt-[var(--nav-height)] pb-12 relative z-10">
         <motion.div 

@@ -48,7 +48,7 @@ function ErrorContent() {
 
 export default function AuthCodeErrorPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cream dark:bg-charcoal-950">
+    <div className="min-h-screen flex items-center justify-center bg-transparent">
       <Suspense fallback={<div />}>
         <ErrorContent />
       </Suspense>

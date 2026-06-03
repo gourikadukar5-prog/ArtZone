@@ -42,7 +42,7 @@ export default function AuthCallbackPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-cream dark:bg-charcoal-950 gap-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-transparent gap-4">
       <div className="w-10 h-10 rounded-full border-4 border-[#FF1493] border-t-transparent animate-spin" />
       <p className="text-charcoal-500 dark:text-charcoal-400 text-sm font-medium">
         Completing sign in...

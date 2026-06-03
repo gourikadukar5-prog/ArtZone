@@ -23,7 +23,7 @@ export default function MandalaPage() {
   const removeArtwork = useArtStore((state) => state.removeArtwork);
 
   return (
-    <div className="min-h-screen bg-cream dark:bg-charcoal-950 text-charcoal-900 dark:text-warm-100 pt-24 pb-32">
+    <div className="min-h-screen bg-transparent text-charcoal-900 dark:text-warm-100 pt-24 pb-32">
 
       {/* ── Hero ── */}
       <section className="container-wide mb-20 mt-12">

@@ -78,7 +78,7 @@ export function Navbar() {
 
   if (isAuthPage) {
     return (
-      <header className="fixed top-0 left-0 right-0 z-50 bg-cream/90 dark:bg-charcoal-950/90 backdrop-blur-xl border-b border-warm-200/60 dark:border-charcoal-800/60">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-transparent">
         <nav className="container-wide flex items-center h-[var(--nav-height)]">
           <Link href="/" className="relative z-10 flex items-center group">
             <ArtZoneLogo />
@@ -94,7 +94,7 @@ export function Navbar() {
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out-expo",
           isScrolled
-            ? "bg-cream/80 backdrop-blur-xl border-b border-warm-200/60 shadow-sm"
+            ? "bg-black/10 backdrop-blur-md shadow-sm"
             : "bg-transparent"
         )}
       >

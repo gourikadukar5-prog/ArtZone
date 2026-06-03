@@ -18,7 +18,7 @@ export default function ProfilePage({ params }: { params: { username: string } }
   const breakpointColumnsObj = { default: 3, 1100: 3, 700: 2, 500: 1 };
 
   return (
-    <div className="min-h-screen bg-cream dark:bg-charcoal-950 pt-[var(--nav-height)] pb-24">
+    <div className="min-h-screen bg-transparent pt-[var(--nav-height)] pb-24">
       {/* Profile Header */}
       <section className="container-wide pt-16 pb-12 border-b border-warm-200 dark:border-charcoal-800">
         <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">

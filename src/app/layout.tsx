@@ -62,6 +62,20 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
+        {/* Global Background Video */}
+        <div className="fixed inset-0 z-[-1] overflow-hidden bg-charcoal-950">
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            className="w-full h-full object-cover opacity-80"
+          >
+            <source src="/new-hero-bg.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-cream/70 dark:bg-charcoal-950/70 backdrop-blur-[2px]" />
+        </div>
+
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

@@ -43,7 +43,7 @@ function SearchResults() {
     : artworks;
 
   return (
-    <div className="min-h-screen pt-28 pb-16 px-4 bg-cream dark:bg-charcoal-950 transition-colors duration-300">
+    <div className="min-h-screen pt-28 pb-16 px-4 bg-transparent transition-colors duration-300">
       <div className="container-wide mx-auto">
 
         {/* Header */}

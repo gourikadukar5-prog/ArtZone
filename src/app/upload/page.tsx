@@ -68,7 +68,7 @@ export default function UploadPage() {
   if (!mounted || !isAuthenticated) return null; // Wait for auth check
 
   return (
-    <div className="min-h-screen bg-cream dark:bg-charcoal-950 pt-24 pb-12 px-4 sm:px-6">
+    <div className="min-h-screen bg-transparent pt-24 pb-12 px-4 sm:px-6">
       <div className="max-w-2xl mx-auto">
         <Link 
           href="/dashboard" 
