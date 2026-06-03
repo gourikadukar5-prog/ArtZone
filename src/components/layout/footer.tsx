@@ -15,11 +15,23 @@ export function Footer() {
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="inline-block mb-6 group">
               <div className="flex flex-col items-start gap-4">
-                {/* Large AZ Logo */}
-                <div className="relative text-[80px] leading-none tracking-tighter drop-shadow-sm select-none">
-                  <span className={`${pacifico.className} text-[#D4A853] relative z-10`} style={{ transform: "rotate(-5deg)", display: "inline-block" }}>A</span>
-                  <span className={`${lilita.className} text-white absolute bottom-0 left-[35px] text-[70px] z-0`}>Z</span>
-                </div>
+                {/* Custom Geometric AZ Logo */}
+                <svg viewBox="0 0 120 100" className="w-24 h-20 mb-2 drop-shadow-sm">
+                  {/* The 'A' */}
+                  <circle cx="28" cy="70" r="14" className="fill-[#D4A853]" />
+                  <polygon points="45,45 65,15 95,85 65,85" className="fill-[#D4A853]" />
+                  
+                  {/* The 'Z' */}
+                  {/* Top bar */}
+                  <polygon points="82,20 108,20 100,38 74,38" className="fill-white" />
+                  {/* Middle bar */}
+                  <polygon points="76,42 102,42 94,60 68,60" className="fill-white" />
+                  {/* Bottom bar */}
+                  <polygon points="70,64 96,64 88,82 62,82" className="fill-white" />
+                  
+                  {/* Thin connecting lines for Z */}
+                  <line x1="100" y1="38" x2="68" y2="82" stroke="white" strokeWidth="1.5" />
+                </svg>
                 
                 {/* ARTZONE Text */}
                 <div className="flex items-center gap-1 text-sm tracking-[0.4em] font-semibold">
