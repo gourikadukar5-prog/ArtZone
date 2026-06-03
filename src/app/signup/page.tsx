@@ -25,13 +25,6 @@ export default function SignupPage() {
         transition={{ duration: 0.6 }}
         className="w-full max-w-md bg-white/70 dark:bg-charcoal-900/70 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-3xl shadow-2xl p-8 sm:p-10 relative"
       >
-        <Link 
-          href="/" 
-          className="absolute -top-12 left-0 flex items-center gap-2 text-sm text-charcoal-500 hover:text-charcoal-900 dark:text-charcoal-400 dark:hover:text-warm-100 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to home
-        </Link>
           <div className="mb-10">
             <h1 className="font-display font-semibold text-title text-charcoal-900 dark:text-warm-100 mb-2">
               Join the gallery
