@@ -73,7 +73,7 @@ export async function insertArtwork(artwork: {
   artist_name: string;
   artist_username: string;
   artist_avatar: string;
-}): Promise<ArtworkDB | null> {
+}): Promise<{ data: ArtworkDB | null; error: string | null }> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("artworks")
@@ -83,9 +83,9 @@ export async function insertArtwork(artwork: {
 
   if (error) {
     console.error("insertArtwork error:", error.message);
-    return null;
+    return { data: null, error: error.message };
   }
-  return data;
+  return { data, error: null };
 }
 
 // ─── Delete artwork + storage file ──────────────────────

@@ -93,7 +93,7 @@ export default function UploadPage() {
       setUploadProgress(90);
 
       // 2. Save artwork metadata to Supabase DB
-      const artwork = await insertArtwork({
+      const { data: artwork, error: insertError } = await insertArtwork({
         title: title.trim(),
         description: description.trim(),
         image_url: imageUrl,
@@ -106,8 +106,10 @@ export default function UploadPage() {
 
       setUploadProgress(100);
 
-      if (!artwork) {
-        toast.error("Failed to save artwork. Please try again.");
+      if (insertError || !artwork) {
+        toast.error("Failed to save artwork", {
+          description: insertError || "Database insert failed. Please check RLS policies.",
+        });
         setIsUploading(false);
         return;
       }
