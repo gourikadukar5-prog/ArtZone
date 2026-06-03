@@ -34,14 +34,11 @@ export function Footer() {
                 </svg>
                 
                 {/* ARTZONE Text */}
-                <div className="flex items-center gap-1 text-sm tracking-[0.4em] font-semibold">
-                  <span className="text-[#D4A853]">A</span>
-                  <span className="text-[#D4A853]">R</span>
-                  <span className="text-[#D4A853]">T</span>
-                  <span className="text-white">Z</span>
-                  <span className="text-white">O</span>
-                  <span className="text-white">N</span>
-                  <span className="text-white">E</span>
+                <div className="flex items-baseline text-3xl transition-transform duration-300 drop-shadow-sm ml-1">
+                  <span className={`${lilita.className} text-[#D4A853]`} style={{ display: "inline-block", transform: "rotate(-2deg)" }}>A</span>
+                  <span className={`${pacifico.className} text-[#D4A853]`} style={{ marginLeft: "-3px" }}>rt</span>
+                  <span className={`${lilita.className} text-white`} style={{ marginLeft: "4px", marginRight: "-2px" }}>Z</span>
+                  <span className={`${pacifico.className} text-white`}>one</span>
                 </div>
               </div>
             </Link>
