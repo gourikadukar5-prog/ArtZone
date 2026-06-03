@@ -5,11 +5,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
-import { Search, Menu, X, Bell, User, Sun, Moon, LogIn, LogOut } from "lucide-react";
+import { Search, Menu, X, Bell, User, Sun, Moon, LogIn, LogOut, LayoutDashboard, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Pacifico, Lilita_One } from "next/font/google";
 import { useArtStore } from "@/lib/store";
 import { createClient } from "@/lib/supabase/client";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import * as Avatar from "@radix-ui/react-avatar";
 
 const pacifico = Pacifico({ weight: "400", subsets: ["latin"] });
 const lilita = Lilita_One({ weight: "400", subsets: ["latin"] });
@@ -169,48 +171,110 @@ export function Navbar() {
               </button>
             )}
 
-            {/* Notification */}
-            <button
-              className="hidden sm:block p-2.5 rounded-full text-charcoal-600 dark:text-charcoal-400 hover:bg-white dark:hover:bg-charcoal-800 transition-colors shadow-sm bg-white/40 dark:bg-charcoal-900/40 backdrop-blur-sm ml-1"
-              aria-label="Notifications"
-            >
-              <Bell className="w-4 h-4" />
-            </button>
+            {/* Notification Dropdown */}
+            {isAuthenticated && (
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <button
+                    className="hidden sm:block p-2.5 rounded-full text-charcoal-600 dark:text-charcoal-400 hover:bg-white dark:hover:bg-charcoal-800 transition-colors shadow-sm bg-white/40 dark:bg-charcoal-900/40 backdrop-blur-sm ml-1 relative outline-none"
+                    aria-label="Notifications"
+                  >
+                    <Bell className="w-4 h-4" />
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-accent-terracotta rounded-full border-2 border-white dark:border-charcoal-900"></span>
+                  </button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content
+                    className="z-[100] min-w-[280px] bg-white/80 dark:bg-charcoal-900/80 backdrop-blur-xl border border-warm-200/50 dark:border-charcoal-800/50 rounded-2xl p-2 shadow-xl animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-2 mt-2 mr-4"
+                    sideOffset={5}
+                  >
+                    <div className="px-3 py-2 border-b border-warm-100 dark:border-charcoal-800 mb-2">
+                      <h3 className="text-sm font-semibold text-charcoal-900 dark:text-warm-100">Notifications</h3>
+                    </div>
+                    <DropdownMenu.Item className="flex flex-col outline-none cursor-pointer rounded-xl px-3 py-2 hover:bg-warm-100/50 dark:hover:bg-charcoal-800/50 focus:bg-warm-100/50 dark:focus:bg-charcoal-800/50 transition-colors">
+                      <span className="text-sm font-medium text-charcoal-900 dark:text-warm-100">Alex liked your sketch</span>
+                      <span className="text-xs text-charcoal-500 dark:text-charcoal-400 mt-0.5">2 hours ago</span>
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item className="flex flex-col outline-none cursor-pointer rounded-xl px-3 py-2 hover:bg-warm-100/50 dark:hover:bg-charcoal-800/50 focus:bg-warm-100/50 dark:focus:bg-charcoal-800/50 transition-colors">
+                      <span className="text-sm font-medium text-charcoal-900 dark:text-warm-100">New follower: Sarah</span>
+                      <span className="text-xs text-charcoal-500 dark:text-charcoal-400 mt-0.5">5 hours ago</span>
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
+            )}
 
             {/* Auth Area */}
-            <div className="hidden lg:flex items-center gap-2 ml-2 border-l border-warm-200 dark:border-charcoal-800 pl-4">
+            <div className="hidden lg:flex items-center gap-2 ml-2 pl-2">
               {!isAuthenticated ? (
                 <>
                   <Link
                     href="/login"
-                    className="flex items-center gap-2 text-sm font-medium text-charcoal-600 dark:text-charcoal-400 hover:text-charcoal-900 dark:hover:text-warm-100 transition-colors"
+                    className="flex items-center gap-2 text-sm font-medium text-charcoal-600 dark:text-charcoal-400 hover:text-charcoal-900 dark:hover:text-warm-100 transition-colors px-3 py-2"
                   >
                     <LogIn className="w-4 h-4" />
                     Log in
                   </Link>
                   <Link
                     href="/signup"
-                    className="px-4 py-2 text-sm font-medium rounded-full bg-charcoal-900 text-white hover:bg-charcoal-800 dark:bg-warm-100 dark:text-charcoal-900 dark:hover:bg-white transition-all shadow-sm ml-2"
+                    className="px-5 py-2 text-sm font-medium rounded-full bg-charcoal-900 text-white hover:bg-charcoal-800 dark:bg-warm-100 dark:text-charcoal-900 dark:hover:bg-white transition-all shadow-sm ml-1"
                   >
                     Sign up
                   </Link>
                 </>
               ) : (
-                <>
-                  <Link
-                    href="/dashboard"
-                    className="flex items-center gap-2 text-sm font-medium text-charcoal-600 dark:text-charcoal-400 hover:text-charcoal-900 dark:hover:text-warm-100 transition-colors"
-                  >
-                    <User className="w-4 h-4" />
-                    <span className="truncate max-w-[100px]">{user?.user_metadata?.full_name || 'Dashboard'}</span>
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 text-sm font-medium text-red-500 hover:text-red-700 transition-colors ml-2"
-                  >
-                    <LogOut className="w-4 h-4" />
-                  </button>
-                </>
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
+                    <button className="flex items-center gap-2 px-1 py-1 rounded-full hover:bg-white/40 dark:hover:bg-charcoal-800/40 transition-colors outline-none ml-2 border border-transparent hover:border-warm-200 dark:hover:border-charcoal-700">
+                      <Avatar.Root className="inline-flex items-center justify-center align-middle overflow-hidden select-none w-8 h-8 rounded-full bg-warm-200 dark:bg-charcoal-800 border border-warm-300 dark:border-charcoal-700">
+                        <Avatar.Fallback className="w-full h-full flex items-center justify-center bg-white dark:bg-charcoal-900 text-charcoal-900 dark:text-warm-100 text-xs font-medium uppercase">
+                          {user?.user_metadata?.full_name?.charAt(0) || 'U'}
+                        </Avatar.Fallback>
+                      </Avatar.Root>
+                    </button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content
+                      className="z-[100] min-w-[200px] bg-white/80 dark:bg-charcoal-900/80 backdrop-blur-xl border border-warm-200/50 dark:border-charcoal-800/50 rounded-2xl p-2 shadow-xl animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-2 mt-2 mr-4"
+                      sideOffset={5}
+                    >
+                      <div className="px-3 py-2 border-b border-warm-100 dark:border-charcoal-800 mb-1">
+                        <p className="text-sm font-semibold text-charcoal-900 dark:text-warm-100 truncate">
+                          {user?.user_metadata?.full_name || 'Artist'}
+                        </p>
+                        <p className="text-xs text-charcoal-500 dark:text-charcoal-400 truncate">
+                          {user?.email}
+                        </p>
+                      </div>
+                      
+                      <DropdownMenu.Item asChild>
+                        <Link href="/dashboard" className="flex items-center gap-2 outline-none cursor-pointer rounded-xl px-3 py-2 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-warm-100/50 dark:hover:bg-charcoal-800/50 focus:bg-warm-100/50 dark:focus:bg-charcoal-800/50 transition-colors mt-1">
+                          <LayoutDashboard className="w-4 h-4" />
+                          Dashboard
+                        </Link>
+                      </DropdownMenu.Item>
+                      
+                      <DropdownMenu.Item asChild>
+                        <Link href="/upload" className="flex items-center gap-2 outline-none cursor-pointer rounded-xl px-3 py-2 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-warm-100/50 dark:hover:bg-charcoal-800/50 focus:bg-warm-100/50 dark:focus:bg-charcoal-800/50 transition-colors">
+                          <ImageIcon className="w-4 h-4" />
+                          Upload Art
+                        </Link>
+                      </DropdownMenu.Item>
+
+                      <DropdownMenu.Separator className="h-px bg-warm-200/50 dark:bg-charcoal-800/50 my-1" />
+
+                      <DropdownMenu.Item asChild>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-2 outline-none cursor-pointer rounded-xl px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Log out
+                        </button>
+                      </DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
               )}
             </div>
 

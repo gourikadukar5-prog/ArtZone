@@ -73,7 +73,8 @@ export default function RootLayout({
           >
             <source src="/new-hero-bg.mp4" type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-cream/70 dark:bg-charcoal-950/70 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-white/40 dark:bg-black/60 mix-blend-overlay" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/60 dark:to-black/80" />
         </div>
 
         <ThemeProvider
