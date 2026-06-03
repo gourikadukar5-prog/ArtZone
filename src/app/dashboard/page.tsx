@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { formatNumber, cn } from "@/lib/utils";
 import { useArtStore } from "@/lib/store";
+import { fetchArtworks, deleteArtwork, ArtworkDB } from "@/lib/artworks";
 import { useRouter } from "next/navigation";
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
@@ -89,8 +90,10 @@ export default function DashboardPage() {
   const [activeSettingsTab, setActiveSettingsTab] = useState("profile");
   const [timeFilter, setTimeFilter] = useState("7 Days");
   const [mounted, setMounted] = useState(false);
+  const [myArtworks, setMyArtworks] = useState<ArtworkDB[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  const { artworks, removeArtwork, user, isAuthenticated } = useArtStore();
+  const { user, isAuthenticated } = useArtStore();
 
   useEffect(() => {
     setMounted(true);
@@ -99,8 +102,29 @@ export default function DashboardPage() {
     }
   }, [isAuthenticated, mounted, router]);
 
+  useEffect(() => {
+    if (mounted && isAuthenticated && user) {
+      setLoading(true);
+      fetchArtworks().then((data) => {
+        // Filter only the logged in user's artworks
+        const userArtworks = data.filter(a => a.user_id === user.id);
+        setMyArtworks(userArtworks);
+        setLoading(false);
+      });
+    }
+  }, [mounted, isAuthenticated, user]);
+
+  const handleRemoveArtwork = async (id: string, imageUrl: string) => {
+    if (!user) return;
+    if (confirm("Are you sure you want to remove this artwork?")) {
+      const success = await deleteArtwork(id, imageUrl, user.id);
+      if (success) {
+        setMyArtworks(prev => prev.filter(a => a.id !== id));
+      }
+    }
+  };
+
   const userName = user?.user_metadata?.full_name || "Gouri Kadukar";
-  const myArtworks = artworks.filter(a => a.artist.name === userName || a.artist.name === "Anonymous");
   const topArtwork = myArtworks.length > 0 ? [...myArtworks].sort((a, b) => (b.likes || 0) - (a.likes || 0))[0] : null;
 
   if (!mounted || !isAuthenticated) return null;
@@ -363,7 +387,7 @@ export default function DashboardPage() {
                       <div key={art.id} className="group relative rounded-2xl overflow-hidden bg-charcoal-100 dark:bg-charcoal-900 border border-white/50 dark:border-white/10 shadow-sm">
                         <div className="aspect-[4/5] relative overflow-hidden">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={art.imageUrl} alt={art.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                          <img src={art.image_url} alt={art.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                           
                           {/* Hover Actions */}
@@ -374,7 +398,7 @@ export default function DashboardPage() {
                             <button className="p-2.5 rounded-full bg-white/95 text-charcoal-900 hover:bg-white hover:scale-110 transition-all shadow-xl">
                               <Edit2 className="w-4 h-4" />
                             </button>
-                            <button onClick={() => removeArtwork(art.id)} className="p-2.5 rounded-full bg-red-500/90 text-white hover:bg-red-500 hover:scale-110 transition-all shadow-xl">
+                            <button onClick={() => handleRemoveArtwork(art.id, art.image_url)} className="p-2.5 rounded-full bg-red-500/90 text-white hover:bg-red-500 hover:scale-110 transition-all shadow-xl">
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
@@ -427,7 +451,7 @@ export default function DashboardPage() {
                       <div className="mt-4 flex flex-col h-[calc(100%-3rem)]">
                         <div className="relative aspect-video rounded-xl overflow-hidden mb-4 shadow-sm border border-white/20 dark:border-white/10">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={topArtwork.imageUrl} alt={topArtwork.title} className="w-full h-full object-cover" />
+                          <img src={topArtwork.image_url} alt={topArtwork.title} className="w-full h-full object-cover" />
                           <div className="absolute top-2 left-2 bg-charcoal-900/80 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
                             <Award className="w-3.5 h-3.5 text-[#D4A853]" /> #1 This Month
                           </div>
