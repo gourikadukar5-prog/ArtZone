@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -20,15 +19,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex bg-cream dark:bg-charcoal-950">
       {/* Left side: Form */}
-      <div className="flex-1 flex flex-col justify-center px-8 sm:px-16 lg:px-24 pt-24 pb-12 relative z-10">
-        <Link 
-          href="/" 
-          className="absolute top-8 left-8 sm:left-16 flex items-center gap-2 text-sm text-charcoal-500 hover:text-charcoal-900 dark:text-charcoal-400 dark:hover:text-warm-100 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to home
-        </Link>
-
+      <div className="flex-1 flex flex-col justify-center px-8 sm:px-16 lg:px-24 pt-[var(--nav-height)] pb-12 relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

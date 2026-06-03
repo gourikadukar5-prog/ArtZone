@@ -24,7 +24,7 @@ export default function SketchesPage() {
   const sketchArtworks = artworks.filter((a) => a.category === "sketch");
 
   return (
-    <div className="min-h-screen bg-cream text-charcoal-900 pt-24 pb-32">
+    <div className="min-h-screen bg-cream dark:bg-charcoal-950 text-charcoal-900 dark:text-warm-100 pt-24 pb-32">
 
       {/* ── Hero ── */}
       <section className="container-wide mb-20 mt-12">

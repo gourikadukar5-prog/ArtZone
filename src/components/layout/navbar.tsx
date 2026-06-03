@@ -21,13 +21,26 @@ const NAV_LINKS = [
   { label: "Community", href: "/gallery" }, // Using gallery as placeholder for Community
 ];
 
+const AUTH_ROUTES = ["/login", "/signup", "/forgot-password"];
+
+function ArtZoneLogo() {
+  return (
+    <div className="flex items-baseline text-[36px] text-[#FF1493] transition-transform duration-300 group-hover:scale-105 tracking-tight drop-shadow-sm">
+      <span className={lilita.className} style={{ display: "inline-block", transform: "rotate(-2deg)" }}>A</span>
+      <span className={pacifico.className} style={{ marginLeft: "-3px" }}>rt</span>
+      <span className={lilita.className} style={{ marginLeft: "2px", marginRight: "-2px" }}>Z</span>
+      <span className={pacifico.className}>one</span>
+    </div>
+  );
+}
+
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   const { isAuthenticated, user, setUser } = useArtStore();
@@ -61,6 +74,20 @@ export function Navbar() {
     setIsMobileOpen(false);
   }, [pathname]);
 
+  const isAuthPage = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+
+  if (isAuthPage) {
+    return (
+      <header className="fixed top-0 left-0 right-0 z-50 bg-cream/90 dark:bg-charcoal-950/90 backdrop-blur-xl border-b border-warm-200/60 dark:border-charcoal-800/60">
+        <nav className="container-wide flex items-center h-[var(--nav-height)]">
+          <Link href="/" className="relative z-10 flex items-center group">
+            <ArtZoneLogo />
+          </Link>
+        </nav>
+      </header>
+    );
+  }
+
   return (
     <>
       <header
@@ -77,12 +104,7 @@ export function Navbar() {
             href="/"
             className="relative z-10 flex items-center group"
           >
-            <div className="flex items-baseline text-[36px] text-[#FF1493] transition-transform duration-300 group-hover:scale-105 tracking-tight drop-shadow-sm">
-              <span className={lilita.className} style={{ display: 'inline-block', transform: 'rotate(-2deg)' }}>A</span>
-              <span className={pacifico.className} style={{ marginLeft: '-3px' }}>rt</span>
-              <span className={lilita.className} style={{ marginLeft: '2px', marginRight: '-2px' }}>Z</span>
-              <span className={pacifico.className}>one</span>
-            </div>
+            <ArtZoneLogo />
           </Link>
 
           {/* Desktop Navigation */}
@@ -135,11 +157,11 @@ export function Navbar() {
             {/* Theme Toggle */}
             {mounted && (
               <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
                 className="p-2.5 rounded-full text-charcoal-600 dark:text-charcoal-400 hover:bg-white dark:hover:bg-charcoal-800 transition-colors shadow-sm bg-white/40 dark:bg-charcoal-900/40 backdrop-blur-sm ml-2"
                 aria-label="Toggle theme"
               >
-                {theme === "dark" ? (
+                {resolvedTheme === "dark" ? (
                   <Sun className="w-4 h-4" />
                 ) : (
                   <Moon className="w-4 h-4" />
