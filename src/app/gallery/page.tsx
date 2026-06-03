@@ -268,7 +268,7 @@ export default function GalleryPage() {
                   className="mb-6"
                 >
                   <div className="relative group">
-                    {/* ── DELETE button — LEFT side ── */}
+                    {/* ── DELETE button — LEFT BOTTOM side ── */}
                     {isOwner && (
                       <button
                         onClick={(e) => {
@@ -276,7 +276,7 @@ export default function GalleryPage() {
                           e.stopPropagation();
                           setDeleteTarget(artwork);
                         }}
-                        className="absolute top-3 left-3 z-20 p-2 bg-red-500/90 text-white rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all shadow-md hover:scale-110"
+                        className="absolute bottom-3 left-3 z-20 p-2 bg-red-500/90 text-white rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all shadow-md hover:scale-110"
                         title="Delete artwork"
                       >
                         <Trash2 className="w-4 h-4" />
