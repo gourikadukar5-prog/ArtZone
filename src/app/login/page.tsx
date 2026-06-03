@@ -17,15 +17,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-transparent">
-      {/* Left side: Form */}
-      <div className="flex-1 flex flex-col justify-center px-8 sm:px-16 lg:px-24 pt-[var(--nav-height)] pb-12 relative z-10">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="w-full max-w-md mx-auto"
-        >
+    <div className="min-h-screen flex items-center justify-center bg-transparent pt-[var(--nav-height)] pb-12 px-4 sm:px-6 relative z-10">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md w-full bg-white/70 dark:bg-charcoal-900/70 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-3xl shadow-2xl p-8 sm:p-10"
+      >
           <div className="mb-10">
             <h1 className="font-display font-semibold text-title text-charcoal-900 dark:text-warm-100 mb-2">
               Welcome back
@@ -100,27 +98,7 @@ export default function LoginPage() {
               Sign up
             </Link>
           </p>
-        </motion.div>
-      </div>
-
-      {/* Right side: Image */}
-      <div className="hidden lg:block lg:flex-1 relative bg-charcoal-900">
-        <Image 
-          src="https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=1200&q=80"
-          alt="Creative workspace"
-          fill
-          className="object-cover opacity-80 mix-blend-luminosity"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/20 to-transparent" />
-        <div className="absolute bottom-16 left-16 right-16">
-          <p className="font-display text-2xl text-warm-100 italic leading-snug">
-            &quot;Art is not what you see, but what you make others see.&quot;
-          </p>
-          <p className="text-charcoal-400 mt-4 text-sm font-medium tracking-widest uppercase">
-            — Edgar Degas
-          </p>
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

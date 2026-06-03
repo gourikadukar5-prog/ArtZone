@@ -18,23 +18,20 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-transparent">
-      {/* Left side: Form */}
-      <div className="flex-1 flex flex-col justify-center px-8 sm:px-16 lg:px-24 pt-24 pb-12 relative z-10 overflow-y-auto">
+    <div className="min-h-screen flex items-center justify-center bg-transparent pt-24 pb-12 px-4 sm:px-6 relative z-10">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md bg-white/70 dark:bg-charcoal-900/70 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-3xl shadow-2xl p-8 sm:p-10 relative"
+      >
         <Link 
           href="/" 
-          className="absolute top-8 left-8 sm:left-16 flex items-center gap-2 text-sm text-charcoal-500 hover:text-charcoal-900 dark:text-charcoal-400 dark:hover:text-warm-100 transition-colors"
+          className="absolute -top-12 left-0 flex items-center gap-2 text-sm text-charcoal-500 hover:text-charcoal-900 dark:text-charcoal-400 dark:hover:text-warm-100 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to home
         </Link>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="w-full max-w-md mx-auto my-auto"
-        >
           <div className="mb-10">
             <h1 className="font-display font-semibold text-title text-charcoal-900 dark:text-warm-100 mb-2">
               Join the gallery
@@ -127,19 +124,7 @@ export default function SignupPage() {
               Sign in
             </Link>
           </p>
-        </motion.div>
-      </div>
-
-      {/* Right side: Image */}
-      <div className="hidden lg:block lg:flex-1 relative bg-charcoal-900">
-        <Image 
-          src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=1200&q=80"
-          alt="Hands sketching"
-          fill
-          className="object-cover opacity-70 mix-blend-luminosity"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-charcoal-950 to-transparent opacity-80" />
-      </div>
+      </motion.div>
     </div>
   );
 }
