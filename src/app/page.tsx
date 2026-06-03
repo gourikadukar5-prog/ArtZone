@@ -81,7 +81,7 @@ export default function HomePage() {
             playsInline 
             className="w-full h-full object-cover"
           >
-            <source src="/hero-bg.mp4" type="video/mp4" />
+            <source src="/new-hero-bg.mp4" type="video/mp4" />
           </video>
           {/* Overlay to ensure text readability */}
           <div className="absolute inset-0 bg-cream/80 dark:bg-charcoal-950/80 backdrop-blur-[2px]" />
