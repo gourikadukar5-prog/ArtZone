@@ -74,7 +74,7 @@ const EmptyState = ({ icon: Icon, title, desc, action }: { icon: React.ElementTy
       <Icon className="w-8 h-8 text-charcoal-400 dark:text-charcoal-500" />
     </div>
     <h3 className="text-2xl font-handwriting font-medium tracking-wide text-charcoal-900 dark:text-warm-100 mb-2">{title}</h3>
-    <p className="text-sm text-charcoal-500 dark:text-charcoal-400 max-w-xs mb-4">{desc}</p>
+    <p className="font-handwriting tracking-wide text-xl text-charcoal-500 dark:text-charcoal-400 max-w-xs mb-4">{desc}</p>
     {action}
   </div>
 );
@@ -97,8 +97,8 @@ const ArtworkCard = ({ art, onDelete, showDelete }: { art: ArtworkDB; onDelete?:
       )}
     </div>
     <div className="p-4 bg-white/80 dark:bg-charcoal-900/80 backdrop-blur-md absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-      <h3 className="font-semibold text-sm text-charcoal-900 dark:text-warm-100 truncate mb-1">{art.title}</h3>
-      <div className="flex items-center gap-3 text-xs text-charcoal-500 dark:text-charcoal-400">
+      <h3 className="font-handwriting font-medium tracking-wide text-2xl text-charcoal-900 dark:text-warm-100 truncate mb-1">{art.title}</h3>
+      <div className="flex items-center gap-3 font-handwriting text-lg text-charcoal-500 dark:text-charcoal-400">
         <span className="flex items-center gap-1"><FolderHeart className="w-3 h-3" /> {formatNumber(art.saves || 0)}</span>
         <span className="flex items-center gap-1"><Heart className="w-3 h-3" /> {formatNumber(art.likes || 0)}</span>
       </div>
@@ -122,8 +122,8 @@ const SavedCard = ({ art, onUnsave }: { art: ArtworkDB; onUnsave: () => void }) 
       </button>
     </div>
     <div className="p-3 border-t border-white/20 dark:border-white/10">
-      <h3 className="font-semibold text-sm text-charcoal-900 dark:text-warm-100 truncate">{art.title}</h3>
-      <p className="text-xs text-charcoal-500 dark:text-charcoal-400 capitalize">{art.artist_name}</p>
+      <h3 className="font-handwriting font-medium tracking-wide text-2xl text-charcoal-900 dark:text-warm-100 truncate">{art.title}</h3>
+      <p className="font-handwriting text-lg text-charcoal-500 dark:text-charcoal-400 capitalize">{art.artist_name}</p>
     </div>
   </div>
 );
@@ -362,7 +362,7 @@ export default function DashboardPage() {
                           <div className="p-2 rounded-xl bg-white dark:bg-charcoal-900 shadow-sm border border-white/50 dark:border-white/10">
                             <stat.icon className="w-5 h-5 text-charcoal-700 dark:text-warm-100" />
                           </div>
-                          <p className="text-sm font-semibold text-charcoal-600 dark:text-charcoal-300">{stat.label}</p>
+                          <p className="font-handwriting tracking-wide text-2xl text-charcoal-600 dark:text-charcoal-300">{stat.label}</p>
                         </div>
                         <h3 className="text-3xl font-display font-bold text-charcoal-900 dark:text-warm-100 tracking-tight">{stat.value}</h3>
                       </GlassCard>
@@ -372,7 +372,7 @@ export default function DashboardPage() {
                   <GlassCard className="xl:col-span-1 p-8 bg-gradient-to-br from-charcoal-900 to-charcoal-950 dark:from-[#1A1A1A] dark:to-[#0A0A0A] border-none text-white relative overflow-hidden flex flex-col justify-center items-center text-center">
                     <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-gradient-to-bl from-accent-terracotta/30 to-transparent rounded-full blur-2xl" />
                     <Award className="w-12 h-12 text-[#D4A853] mb-4" />
-                    <h3 className="text-lg font-semibold text-warm-100 mb-2">Total Comments</h3>
+                    <h3 className="font-handwriting tracking-wide text-2xl text-warm-100 mb-2">Total Comments</h3>
                     <p className="text-5xl font-display font-bold text-white mb-2">{formatNumber(totalComments)}</p>
                     <p className="text-sm text-charcoal-400">across all your artworks</p>
                   </GlassCard>
@@ -457,7 +457,7 @@ export default function DashboardPage() {
                     <SectionTitle title="Recent Activity" icon={BellRing} />
                     <div className="flex flex-col items-center justify-center py-8 text-center">
                       <MessageSquare className="w-8 h-8 text-charcoal-300 dark:text-charcoal-700 mb-3" />
-                      <p className="text-sm text-charcoal-500 dark:text-charcoal-400">No recent activity.</p>
+                      <p className="font-handwriting tracking-wide text-xl text-charcoal-500 dark:text-charcoal-400">No recent activity.</p>
                     </div>
                   </GlassCard>
 
@@ -473,15 +473,15 @@ export default function DashboardPage() {
                             <Award className="w-3.5 h-3.5 text-[#D4A853]" /> #1 Top
                           </div>
                         </div>
-                        <h3 className="font-bold text-lg text-charcoal-900 dark:text-warm-100 mb-1">{topArtwork.title}</h3>
-                        <p className="text-sm text-charcoal-500 dark:text-charcoal-400 capitalize mb-4">{topArtwork.category}</p>
+                        <h3 className="font-handwriting font-medium tracking-wide text-2xl text-charcoal-900 dark:text-warm-100 mb-1">{topArtwork.title}</h3>
+                        <p className="font-handwriting text-xl text-charcoal-500 dark:text-charcoal-400 capitalize mb-4">{topArtwork.category}</p>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="bg-white/50 dark:bg-charcoal-800/50 rounded-xl p-3 border border-white/40 dark:border-white/5">
-                            <p className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 mb-1">Saves</p>
+                            <p className="font-handwriting tracking-wide text-lg text-charcoal-500 dark:text-charcoal-400 mb-1">Saves</p>
                             <p className="text-xl font-display font-bold text-charcoal-900 dark:text-warm-100">{formatNumber(topArtwork.saves || 0)}</p>
                           </div>
                           <div className="bg-white/50 dark:bg-charcoal-800/50 rounded-xl p-3 border border-white/40 dark:border-white/5">
-                            <p className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 mb-1">Likes</p>
+                            <p className="font-handwriting tracking-wide text-lg text-charcoal-500 dark:text-charcoal-400 mb-1">Likes</p>
                             <p className="text-xl font-display font-bold text-[#C67B5C]">{formatNumber(topArtwork.likes || 0)}</p>
                           </div>
                         </div>
@@ -590,10 +590,10 @@ export default function DashboardPage() {
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-terracotta to-[#D4A853] flex items-center justify-center mb-3 shadow-sm">
                             <FolderHeart className="w-5 h-5 text-white" />
                           </div>
-                          <h3 className="font-bold text-charcoal-900 dark:text-warm-100 mb-1 truncate">{col.name}</h3>
-                          {col.description && <p className="text-xs text-charcoal-500 dark:text-charcoal-400 mb-3 line-clamp-2">{col.description}</p>}
+                          <h3 className="font-handwriting font-medium tracking-wide text-2xl text-charcoal-900 dark:text-warm-100 mb-1 truncate">{col.name}</h3>
+                          {col.description && <p className="font-handwriting text-lg text-charcoal-500 dark:text-charcoal-400 mb-3 line-clamp-2">{col.description}</p>}
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400">{col.artwork_count ?? 0} artworks</span>
+                            <span className="font-handwriting text-lg text-charcoal-500 dark:text-charcoal-400">{col.artwork_count ?? 0} artworks</span>
                             <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteCollection(col.id); }} className="p-1.5 rounded-lg text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all">
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -697,9 +697,9 @@ export default function DashboardPage() {
                           <div key={i} className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: e.color }} />
-                              <span className="text-sm text-charcoal-900 dark:text-warm-100 font-medium">{e.name}</span>
+                              <span className="font-handwriting tracking-wide text-xl text-charcoal-900 dark:text-warm-100">{e.name}</span>
                             </div>
-                            <span className="text-sm font-bold text-charcoal-600 dark:text-charcoal-300">{e.value} artworks</span>
+                            <span className="font-handwriting text-xl text-charcoal-600 dark:text-charcoal-300">{e.value} artworks</span>
                           </div>
                         ))}
                       </div>
@@ -731,8 +731,8 @@ export default function DashboardPage() {
                             }
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-sm text-charcoal-900 dark:text-warm-100 truncate">{artist.display_name}</h3>
-                            <p className="text-xs text-charcoal-500 dark:text-charcoal-400 truncate">{artist.bio || "Artist"}</p>
+                            <h3 className="font-handwriting font-medium tracking-wide text-2xl text-charcoal-900 dark:text-warm-100 truncate">{artist.display_name}</h3>
+                            <p className="font-handwriting text-lg text-charcoal-500 dark:text-charcoal-400 truncate">{artist.bio || "Artist"}</p>
                           </div>
                           <button
                             onClick={() => artist.is_following ? handleUnfollow(artist.id) : handleFollow(artist.id)}
