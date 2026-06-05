@@ -133,7 +133,7 @@ export function Navbar() {
                   "px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
                   pathname === link.href && link.href !== "/" // Home is always active if path is /, but we'll simplify active state
                     ? "text-charcoal-900 bg-white shadow-sm"
-                    : "text-charcoal-500 hover:text-charcoal-900 hover:bg-white/50"
+                    : "text-white hover:text-charcoal-900 hover:bg-white/50"
                 )}
               >
                 {link.label}
@@ -146,7 +146,7 @@ export function Navbar() {
                   "px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
                   pathname === "/upload"
                     ? "text-charcoal-900 bg-white shadow-sm"
-                    : "text-charcoal-500 hover:text-charcoal-900 hover:bg-white/50"
+                    : "text-white hover:text-charcoal-900 hover:bg-white/50"
                 )}
               >
                 Upload Art
@@ -224,7 +224,7 @@ export function Navbar() {
                 <>
                   <Link
                     href="/login"
-                    className="flex items-center gap-2 text-sm font-medium text-charcoal-600 dark:text-charcoal-400 hover:text-charcoal-900 dark:hover:text-warm-100 transition-colors px-3 py-2"
+                    className="flex items-center gap-2 text-sm font-medium text-white hover:text-charcoal-900 dark:hover:text-warm-100 transition-colors px-3 py-2"
                   >
                     <LogIn className="w-4 h-4" />
                     Log in
@@ -350,9 +350,9 @@ export function Navbar() {
                     href={link.href}
                     className={cn(
                       "px-4 py-3 rounded-xl text-base font-medium transition-colors",
-                      pathname === link.href
+                      pathname === link.href && link.href !== "/"
                         ? "bg-white text-charcoal-900 shadow-sm"
-                        : "text-charcoal-600 hover:bg-white/50"
+                        : "text-white hover:bg-white/50 hover:text-charcoal-900"
                     )}
                   >
                     {link.label}
@@ -366,7 +366,7 @@ export function Navbar() {
                         "px-4 py-3 rounded-xl text-base font-medium transition-colors",
                         pathname === "/upload"
                           ? "bg-white text-charcoal-900 shadow-sm"
-                          : "text-charcoal-600 hover:bg-white/50"
+                          : "text-white hover:bg-white/50 hover:text-charcoal-900"
                       )}
                     >
                       Upload Art
@@ -385,7 +385,7 @@ export function Navbar() {
                   <>
                     <Link
                       href="/login"
-                      className="px-4 py-3 rounded-xl text-base font-medium text-charcoal-600 hover:bg-white/50 transition-colors"
+                      className="px-4 py-3 rounded-xl text-base font-medium text-white hover:bg-white/50 hover:text-charcoal-900 transition-colors"
                     >
                       Log in
                     </Link>
