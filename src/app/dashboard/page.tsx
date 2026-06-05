@@ -331,7 +331,7 @@ export default function DashboardPage() {
           {/* Header */}
           <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div>
-              <h1 className="font-display font-semibold text-3xl md:text-4xl text-charcoal-900 dark:text-warm-100 mb-2 tracking-tight">
+              <h1 className="font-display font-semibold text-3xl md:text-4xl text-charcoal-900 dark:text-warm-100 mb-2">
                 Welcome back, {userName.split(" ")[0]}
               </h1>
               <p className="text-charcoal-600 dark:text-charcoal-300 text-base">Here&apos;s a comprehensive overview of your creative journey.</p>
@@ -364,7 +364,7 @@ export default function DashboardPage() {
                           </div>
                           <p className="text-sm font-semibold text-charcoal-600 dark:text-charcoal-300">{stat.label}</p>
                         </div>
-                        <h3 className="text-3xl font-display font-bold text-charcoal-900 dark:text-warm-100 tracking-tight">{stat.value}</h3>
+                        <h3 className="text-3xl font-display font-bold text-charcoal-900 dark:text-warm-100">{stat.value}</h3>
                       </GlassCard>
                     ))}
                   </div>
