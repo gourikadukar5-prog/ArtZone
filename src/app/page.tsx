@@ -73,7 +73,7 @@ export default function HomePage() {
       <AnimatedSection className="relative section container-wide text-center py-24 mt-4 mb-20">
         
         <div className="relative z-10">
-          <motion.h1 variants={fadeUp} custom={0} className="font-display font-semibold text-5xl md:text-7xl mb-6 max-w-4xl mx-auto">
+          <motion.h1 variants={fadeUp} custom={0} className="font-display font-semibold text-5xl md:text-7xl mb-6 max-w-4xl mx-auto tracking-tight">
             What inspires your creativity?
           </motion.h1>
           <motion.p variants={fadeUp} custom={1} className="text-lg text-charcoal-900 font-medium dark:text-warm-100 max-w-2xl mx-auto mb-16 leading-relaxed">
