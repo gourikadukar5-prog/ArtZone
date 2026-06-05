@@ -60,8 +60,8 @@ const GlassCard = ({ children, className }: { children: React.ReactNode; classNa
 
 const SectionTitle = ({ title, icon: Icon, action }: { title: string; icon?: React.ElementType; action?: React.ReactNode }) => (
   <div className="flex items-center justify-between mb-6">
-    <h2 className="text-xl font-display font-semibold text-charcoal-900 dark:text-warm-100 flex items-center gap-2">
-      {Icon && <Icon className="w-5 h-5 text-accent-terracotta dark:text-[#D4A853]" />}
+    <h2 className="text-3xl font-handwriting font-medium tracking-wide text-charcoal-900 dark:text-warm-100 flex items-center gap-2">
+      {Icon && <Icon className="w-6 h-6 text-accent-terracotta dark:text-[#D4A853]" />}
       {title}
     </h2>
     {action && <div>{action}</div>}
@@ -73,7 +73,7 @@ const EmptyState = ({ icon: Icon, title, desc, action }: { icon: React.ElementTy
     <div className="w-16 h-16 rounded-2xl bg-white/50 dark:bg-charcoal-800/50 flex items-center justify-center mb-4">
       <Icon className="w-8 h-8 text-charcoal-400 dark:text-charcoal-500" />
     </div>
-    <h3 className="text-lg font-bold text-charcoal-900 dark:text-warm-100 mb-2">{title}</h3>
+    <h3 className="text-2xl font-handwriting font-medium tracking-wide text-charcoal-900 dark:text-warm-100 mb-2">{title}</h3>
     <p className="text-sm text-charcoal-500 dark:text-charcoal-400 max-w-xs mb-4">{desc}</p>
     {action}
   </div>
@@ -446,7 +446,7 @@ export default function DashboardPage() {
                       ))}
                     </div>
                   ) : (
-                    <EmptyState icon={ImageIcon} title="No artworks yet" desc="Upload your first artwork to see it here." action={<Link href="/upload" className="btn-primary py-2 px-5 text-sm inline-flex items-center gap-2"><Plus className="w-4 h-4" />Upload Now</Link>} />
+                    <EmptyState icon={ImageIcon} title="No Artworks Yet" desc="Upload your first artwork to see it here." action={<Link href="/upload" className="btn-primary py-2 px-5 text-sm inline-flex items-center gap-2"><Plus className="w-4 h-4" />Upload Now</Link>} />
                   )}
                 </GlassCard>
 
@@ -532,7 +532,7 @@ export default function DashboardPage() {
                       ))}
                     </div>
                   ) : (
-                    <EmptyState icon={ImageIcon} title="No artworks yet" desc="Start uploading your art to build your portfolio." action={<Link href="/upload" className="btn-primary py-2 px-5 text-sm inline-flex items-center gap-2"><Plus className="w-4 h-4" />Upload Your First Artwork</Link>} />
+                    <EmptyState icon={ImageIcon} title="No Artworks Yet" desc="Start uploading your art to build your portfolio." action={<Link href="/upload" className="btn-primary py-2 px-5 text-sm inline-flex items-center gap-2"><Plus className="w-4 h-4" />Upload Your First Artwork</Link>} />
                   )}
                 </GlassCard>
               </motion.div>
@@ -602,7 +602,7 @@ export default function DashboardPage() {
                       ))}
                     </div>
                   ) : (
-                    <EmptyState icon={FolderHeart} title="No collections yet" desc="Group your favourite artworks into collections." action={<button onClick={() => setShowCreateCollection(true)} className="btn-primary py-2 px-5 text-sm inline-flex items-center gap-2"><Plus className="w-4 h-4" />Create First Collection</button>} />
+                    <EmptyState icon={FolderHeart} title="No Collections Yet" desc="Group your favourite artworks into collections." action={<button onClick={() => setShowCreateCollection(true)} className="btn-primary py-2 px-5 text-sm inline-flex items-center gap-2"><Plus className="w-4 h-4" />Create First Collection</button>} />
                   )}
                 </GlassCard>
               </motion.div>
@@ -624,7 +624,7 @@ export default function DashboardPage() {
                       ))}
                     </div>
                   ) : (
-                    <EmptyState icon={Heart} title="No saved artworks" desc="Browse the gallery and save artworks you love." action={<Link href="/gallery" className="btn-primary py-2 px-5 text-sm inline-flex items-center gap-2"><Eye className="w-4 h-4" />Browse Gallery</Link>} />
+                    <EmptyState icon={Heart} title="No Saved Artworks" desc="Browse the gallery and save artworks you love." action={<Link href="/gallery" className="btn-primary py-2 px-5 text-sm inline-flex items-center gap-2"><Eye className="w-4 h-4" />Browse Gallery</Link>} />
                   )}
                 </GlassCard>
               </motion.div>

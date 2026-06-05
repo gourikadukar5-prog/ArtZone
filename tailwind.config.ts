@@ -48,6 +48,7 @@ const config: Config = {
       fontFamily: {
         display: ['"Clash Display"', '"Inter"', 'system-ui', 'sans-serif'],
         sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+        handwriting: ['var(--font-handwriting)', 'cursive'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       fontSize: {
