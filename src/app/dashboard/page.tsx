@@ -30,43 +30,6 @@ const SIDEBAR_ITEMS = [
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
-// --- MOCK DATA ---
-const analyticsData = [
-  { name: 'Mon', views: 4000, likes: 2400, followers: 200, engagement: 600 },
-  { name: 'Tue', views: 3000, likes: 1398, followers: 150, engagement: 400 },
-  { name: 'Wed', views: 5000, likes: 3800, followers: 400, engagement: 900 },
-  { name: 'Thu', views: 2780, likes: 3908, followers: 300, engagement: 500 },
-  { name: 'Fri', views: 4890, likes: 4800, followers: 500, engagement: 1200 },
-  { name: 'Sat', views: 6390, likes: 5800, followers: 800, engagement: 1500 },
-  { name: 'Sun', views: 7490, likes: 6300, followers: 1000, engagement: 2100 },
-];
-
-const pieData = [
-  { name: 'Sketches', value: 400, color: '#C67B5C' },
-  { name: 'Mandala', value: 300, color: '#8FA68A' },
-  { name: 'Digital Art', value: 300, color: '#5C6BC0' },
-  { name: 'Portraits', value: 200, color: '#D4A853' },
-  { name: 'Anime', value: 150, color: '#FF7B9C' },
-  { name: 'Others', value: 50, color: '#8884d8' },
-];
-
-const activityFeed = [
-  { id: 1, user: "Alex Chen", action: "liked your artwork", item: "Cosmic Mandala", time: "2 hours ago", icon: Heart, color: "text-[#C67B5C] bg-[#C67B5C]/10" },
-  { id: 2, user: "Sarah Smith", action: "started following you", item: "", time: "5 hours ago", icon: Users, color: "text-[#5C6BC0] bg-[#5C6BC0]/10" },
-  { id: 3, user: "David Kim", action: "commented on", item: "Urban Sketch", time: "Yesterday", icon: MessageSquare, color: "text-[#8FA68A] bg-[#8FA68A]/10" },
-  { id: 4, user: "Elena", action: "saved your artwork", item: "Sacred Geometry", time: "Yesterday", icon: FolderHeart, color: "text-[#D4A853] bg-[#D4A853]/10" },
-];
-
-const SETTINGS_CATEGORIES = [
-  { id: 'profile', label: 'Profile', icon: Users },
-  { id: 'appearance', label: 'Appearance', icon: Palette },
-  { id: 'notifications', label: 'Notifications', icon: Bell },
-  { id: 'privacy', label: 'Privacy', icon: Lock },
-  { id: 'artwork', label: 'Artwork Preferences', icon: ImageIcon },
-  { id: 'security', label: 'Account & Security', icon: Shield },
-  { id: 'danger', label: 'Danger Zone', icon: AlertTriangle, danger: true },
-];
-
 // --- REUSABLE COMPONENTS ---
 const GlassCard = ({ children, className }: { children: React.ReactNode, className?: string }) => (
   <div className={cn("bg-white/70 dark:bg-charcoal-900/70 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] overflow-hidden transition-all duration-300", className)}>
@@ -124,10 +87,41 @@ export default function DashboardPage() {
     }
   };
 
-  const userName = user?.user_metadata?.full_name || "Gouri Kadukar";
+  const userName = user?.user_metadata?.full_name || "Artist";
   const topArtwork = myArtworks.length > 0 ? [...myArtworks].sort((a, b) => (b.likes || 0) - (a.likes || 0))[0] : null;
 
+  // Real stats calculation
+  const totalLikes = myArtworks.reduce((sum, art) => sum + (art.likes || 0), 0);
+  const totalComments = myArtworks.reduce((sum, art) => sum + (art.comments || 0), 0);
+  const totalSaves = myArtworks.reduce((sum, art) => sum + (art.saves || 0), 0);
+  const totalArtworks = myArtworks.length;
+
+  // Real category insights
+  const categoryCounts = myArtworks.reduce((acc, art) => {
+    const cat = art.category || 'other';
+    acc[cat] = (acc[cat] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const COLORS = ['#C67B5C', '#8FA68A', '#5C6BC0', '#D4A853', '#FF7B9C', '#8884d8'];
+  const realPieData = Object.entries(categoryCounts).map(([name, value], index) => ({
+    name: name.charAt(0).toUpperCase() + name.slice(1),
+    value,
+    color: COLORS[index % COLORS.length]
+  }));
+
   if (!mounted || !isAuthenticated) return null;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-transparent pt-[var(--nav-height)] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#D4A853] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-charcoal-600 dark:text-charcoal-400 font-medium font-display animate-pulse">Loading your creative space...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-transparent pt-[var(--nav-height)] flex relative z-10">
@@ -224,10 +218,10 @@ export default function DashboardPage() {
                   {/* Left Col: 4 Stats Cards */}
                   <div className="xl:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {[
-                      { label: "Total Views", value: "84.2K", trend: "+12.5%", isPositive: true, data: [{v: 10}, {v: 15}, {v: 12}, {v: 20}, {v: 18}, {v: 25}, {v: 24}], color: "#C67B5C", icon: Eye },
-                      { label: "Total Likes", value: "12,450", trend: "+5.2%", isPositive: true, data: [{v: 5}, {v: 10}, {v: 8}, {v: 15}, {v: 22}, {v: 18}, {v: 25}], color: "#D4A853", icon: Heart },
-                      { label: "Followers", value: "3,204", trend: "+8.1%", isPositive: true, data: [{v: 100}, {v: 105}, {v: 110}, {v: 108}, {v: 115}, {v: 120}, {v: 125}], color: "#8FA68A", icon: Users },
-                      { label: "Total Artworks", value: myArtworks.length.toString(), trend: "+2", isPositive: true, data: [{v: 1}, {v: 2}, {v: 2}, {v: 3}, {v: 3}, {v: 4}, {v: 5}], color: "#5C6BC0", icon: ImageIcon },
+                      { label: "Total Artworks", value: formatNumber(totalArtworks), color: "#5C6BC0", icon: ImageIcon },
+                      { label: "Total Likes", value: formatNumber(totalLikes), color: "#D4A853", icon: Heart },
+                      { label: "Total Saves", value: formatNumber(totalSaves), color: "#8FA68A", icon: FolderHeart },
+                      { label: "Total Comments", value: formatNumber(totalComments), color: "#C67B5C", icon: MessageSquare },
                     ].map((stat, i) => (
                       <GlassCard key={i} className="p-6 relative group hover:bg-white/90 dark:hover:bg-charcoal-800/90 transition-all duration-300 transform hover:-translate-y-1">
                         <div className="flex justify-between items-start mb-4">
@@ -237,141 +231,78 @@ export default function DashboardPage() {
                             </div>
                             <p className="text-sm font-semibold text-charcoal-600 dark:text-charcoal-300">{stat.label}</p>
                           </div>
-                          <span className={cn("text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1", stat.isPositive ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400" : "bg-charcoal-100 text-charcoal-600 dark:bg-charcoal-800 dark:text-charcoal-300")}>
-                            {stat.isPositive && <ArrowUpRight className="w-3 h-3" />}
-                            {stat.trend}
-                          </span>
                         </div>
                         <div className="flex items-end justify-between">
                           <h3 className="text-3xl font-display font-bold text-charcoal-900 dark:text-warm-100 tracking-tight">{stat.value}</h3>
-                          {stat.data && (
-                            <div className="h-12 w-24 opacity-80 group-hover:opacity-100 transition-opacity">
-                              <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={stat.data}>
-                                  <Line type="monotone" dataKey="v" stroke={stat.color} strokeWidth={3} dot={false} isAnimationActive={false} />
-                                </LineChart>
-                              </ResponsiveContainer>
-                            </div>
-                          )}
                         </div>
                       </GlassCard>
                     ))}
                   </div>
 
-                  {/* Right Col: Creator Performance Score */}
-                  <GlassCard className="xl:col-span-1 p-8 bg-gradient-to-br from-charcoal-900 to-charcoal-950 dark:from-[#1A1A1A] dark:to-[#0A0A0A] border-none text-white relative overflow-hidden flex flex-col justify-between">
+                  <GlassCard className="xl:col-span-1 p-8 bg-gradient-to-br from-charcoal-900 to-charcoal-950 dark:from-[#1A1A1A] dark:to-[#0A0A0A] border-none text-white relative overflow-hidden flex flex-col justify-center items-center text-center">
                     <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-gradient-to-bl from-accent-terracotta/30 to-transparent rounded-full blur-2xl" />
                     
-                    <div>
-                      <div className="flex justify-between items-start mb-6">
-                        <h3 className="text-lg font-semibold text-warm-100 opacity-90">Creator Impact Score</h3>
-                        <Award className="w-6 h-6 text-[#D4A853]" />
-                      </div>
-                      
-                      <div className="flex items-end gap-4 mb-2">
-                        <span className="text-6xl font-display font-bold tracking-tighter text-white">92</span>
-                        <span className="text-green-400 font-semibold mb-2 flex items-center"><ArrowUpRight className="w-4 h-4 mr-1" /> +4 this week</span>
-                      </div>
-                      <p className="text-sm text-charcoal-300 mb-8">Top 5% of artists in the Mandala category. Keep up the great work!</p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between text-xs mb-1 font-medium text-charcoal-300">
-                          <span>Profile Completeness</span>
-                          <span className="text-white">100%</span>
-                        </div>
-                        <div className="w-full bg-white/10 rounded-full h-1.5"><div className="bg-green-400 h-1.5 rounded-full w-full"></div></div>
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-xs mb-1 font-medium text-charcoal-300">
-                          <span>Engagement Rate</span>
-                          <span className="text-white">8.4% (Excellent)</span>
-                        </div>
-                        <div className="w-full bg-white/10 rounded-full h-1.5"><div className="bg-[#D4A853] h-1.5 rounded-full w-[84%]"></div></div>
-                      </div>
-                    </div>
+                    <Award className="w-12 h-12 text-charcoal-600 mb-4 opacity-50" />
+                    <h3 className="text-lg font-semibold text-warm-100 opacity-90 mb-2">Creator Impact Score</h3>
+                    <p className="text-sm text-charcoal-400">
+                      We need more data to calculate your impact score. Keep uploading and sharing your artworks!
+                    </p>
                   </GlassCard>
                 </div>
 
                 {/* SECTION 4: PERFORMANCE ANALYTICS & SECTION 7: CATEGORY INSIGHTS */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Performance Analytics */}
-                  <GlassCard className="lg:col-span-2 p-6 md:p-8">
-                    <SectionTitle 
-                      title="Performance Analytics" 
-                      icon={Activity} 
-                      action={
-                        <div className="flex bg-white/60 dark:bg-charcoal-900/60 p-1 rounded-xl backdrop-blur-md border border-white/40 dark:border-white/10">
-                          {['7 Days', '30 Days', '90 Days'].map((t) => (
-                            <button key={t} onClick={() => setTimeFilter(t)} className={cn("px-4 py-1.5 text-xs font-semibold rounded-lg transition-colors", timeFilter === t ? "bg-white dark:bg-charcoal-800 text-charcoal-900 dark:text-warm-100 shadow-sm" : "text-charcoal-600 dark:text-charcoal-400 hover:text-charcoal-900 dark:hover:text-warm-100")}>
-                              {t}
-                            </button>
-                          ))}
-                        </div>
-                      }
-                    />
-                    <div className="h-[300px] w-full mt-6">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={analyticsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                          <defs>
-                            <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#C67B5C" stopOpacity={0.3}/>
-                              <stop offset="95%" stopColor="#C67B5C" stopOpacity={0}/>
-                            </linearGradient>
-                            <linearGradient id="colorLikes" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#D4A853" stopOpacity={0.3}/>
-                              <stop offset="95%" stopColor="#D4A853" stopOpacity={0}/>
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="opacity-10 dark:opacity-5" />
-                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'currentColor', opacity: 0.5 }} dy={10} />
-                          <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'currentColor', opacity: 0.5 }} />
-                          <RechartsTooltip 
-                            contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)', color: '#1A1A1A' }}
-                          />
-                          <Area type="monotone" dataKey="views" name="Views" stroke="#C67B5C" strokeWidth={3} fillOpacity={1} fill="url(#colorViews)" />
-                          <Area type="monotone" dataKey="likes" name="Likes" stroke="#D4A853" strokeWidth={3} fillOpacity={1} fill="url(#colorLikes)" />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </div>
+                  <GlassCard className="lg:col-span-2 p-6 md:p-8 flex flex-col items-center justify-center text-center min-h-[300px]">
+                    <Activity className="w-12 h-12 text-charcoal-300 dark:text-charcoal-700 mb-4" />
+                    <h3 className="text-lg font-semibold text-charcoal-900 dark:text-warm-100 mb-2">Performance Analytics</h3>
+                    <p className="text-sm text-charcoal-500 dark:text-charcoal-400 max-w-sm">
+                      Not enough historical data available yet to generate performance charts.
+                    </p>
                   </GlassCard>
 
                   {/* Category Insights Pie Chart */}
-                  <GlassCard className="p-6 md:p-8 flex flex-col">
+                  <GlassCard className="p-6 md:p-8 flex flex-col min-h-[300px]">
                     <SectionTitle title="Category Insights" icon={PieChartIcon} />
-                    <div className="flex-1 min-h-[250px] relative">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={pieData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={90}
-                            paddingAngle={5}
-                            dataKey="value"
-                            stroke="none"
-                          >
-                            {pieData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <RechartsTooltip 
-                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                          />
-                        </PieChart>
-                      </ResponsiveContainer>
-                      {/* Custom Legend */}
-                      <div className="absolute bottom-0 w-full flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
-                        {pieData.slice(0,4).map((entry, i) => (
-                          <div key={i} className="flex items-center gap-1.5 text-xs text-charcoal-600 dark:text-charcoal-300 font-medium">
-                            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
-                            {entry.name}
-                          </div>
-                        ))}
+                    {realPieData.length > 0 ? (
+                      <div className="flex-1 min-h-[200px] relative mt-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={realPieData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={50}
+                              outerRadius={80}
+                              paddingAngle={5}
+                              dataKey="value"
+                              stroke="none"
+                            >
+                              {realPieData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            <RechartsTooltip 
+                              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                        {/* Custom Legend */}
+                        <div className="absolute bottom-0 w-full flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
+                          {realPieData.map((entry, i) => (
+                            <div key={i} className="flex items-center gap-1.5 text-xs text-charcoal-600 dark:text-charcoal-300 font-medium">
+                              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
+                              {entry.name}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="flex-1 flex flex-col items-center justify-center text-center mt-4">
+                        <PieChartIcon className="w-8 h-8 text-charcoal-300 dark:text-charcoal-700 mb-3" />
+                        <p className="text-sm text-charcoal-500 dark:text-charcoal-400">No categories to display.</p>
+                      </div>
+                    )}
                   </GlassCard>
                 </div>
 
@@ -406,8 +337,8 @@ export default function DashboardPage() {
                         <div className="p-4 bg-white/80 dark:bg-charcoal-900/80 backdrop-blur-md absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                           <h3 className="font-semibold text-sm text-charcoal-900 dark:text-warm-100 truncate mb-1">{art.title}</h3>
                           <div className="flex items-center gap-3 text-xs text-charcoal-500 dark:text-charcoal-400">
-                            <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {formatNumber(art.likes * 14)}</span>
-                            <span className="flex items-center gap-1"><Heart className="w-3 h-3" /> {formatNumber(art.likes)}</span>
+                            <span className="flex items-center gap-1"><FolderHeart className="w-3 h-3" /> {formatNumber(art.saves || 0)}</span>
+                            <span className="flex items-center gap-1"><Heart className="w-3 h-3" /> {formatNumber(art.likes || 0)}</span>
                           </div>
                         </div>
                       </div>
@@ -428,19 +359,11 @@ export default function DashboardPage() {
                   <GlassCard className="p-6 md:p-8">
                     <SectionTitle title="Recent Activity" icon={BellRing} />
                     <div className="space-y-6 mt-4">
-                      {activityFeed.map((activity) => (
-                        <div key={activity.id} className="flex items-start gap-4 group">
-                          <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110 shadow-sm", activity.color)}>
-                            <activity.icon className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <p className="text-sm text-charcoal-900 dark:text-warm-100 font-medium leading-snug">
-                              {activity.user} <span className="font-normal text-charcoal-500 dark:text-charcoal-400">{activity.action}</span> {activity.item && <span className="font-semibold">{activity.item}</span>}
-                            </p>
-                            <p className="text-xs font-medium text-charcoal-400 dark:text-charcoal-500 mt-1">{activity.time}</p>
-                          </div>
-                        </div>
-                      ))}
+                      {/* Empty state for activity feed since we don't have this data yet */}
+                      <div className="flex flex-col items-center justify-center py-8 text-center">
+                        <MessageSquare className="w-8 h-8 text-charcoal-300 dark:text-charcoal-700 mb-3" />
+                        <p className="text-sm text-charcoal-500 dark:text-charcoal-400">No recent activity.</p>
+                      </div>
                     </div>
                   </GlassCard>
 
@@ -460,12 +383,12 @@ export default function DashboardPage() {
                         <p className="text-sm text-charcoal-500 dark:text-charcoal-400 capitalize mb-4">{topArtwork.category}</p>
                         <div className="grid grid-cols-2 gap-4 mt-auto">
                           <div className="bg-white/50 dark:bg-charcoal-800/50 rounded-xl p-3 border border-white/40 dark:border-white/5">
-                            <p className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 mb-1">Total Views</p>
-                            <p className="text-xl font-display font-bold text-charcoal-900 dark:text-warm-100">{formatNumber(topArtwork.likes * 24)}</p>
+                            <p className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 mb-1">Total Saves</p>
+                            <p className="text-xl font-display font-bold text-charcoal-900 dark:text-warm-100">{formatNumber(topArtwork.saves || 0)}</p>
                           </div>
                           <div className="bg-white/50 dark:bg-charcoal-800/50 rounded-xl p-3 border border-white/40 dark:border-white/5">
                             <p className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400 mb-1">Total Likes</p>
-                            <p className="text-xl font-display font-bold text-[#C67B5C]">{formatNumber(topArtwork.likes)}</p>
+                            <p className="text-xl font-display font-bold text-[#C67B5C]">{formatNumber(topArtwork.likes || 0)}</p>
                           </div>
                         </div>
                       </div>
