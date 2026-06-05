@@ -21,8 +21,10 @@ interface ArtStore {
   userUploadIds: string[];
   // Auth state
   user: any | null;
+  userAvatarUrl: string | null;
   isAuthenticated: boolean;
   setUser: (user: any | null) => void;
+  setUserAvatarUrl: (url: string | null) => void;
   addArtwork: (artwork: Omit<Artwork, 'id' | 'likes' | 'comments' | 'saves' | 'createdAt' | 'artist'>) => void;
   removeArtwork: (id: string) => void;
 }
@@ -33,9 +35,11 @@ export const useArtStore = create<ArtStore>()(
       artworks: [...DEMO_ARTWORKS],
       userUploadIds: [],
       user: null,
+      userAvatarUrl: null,
       isAuthenticated: false,
 
       setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setUserAvatarUrl: (url) => set({ userAvatarUrl: url }),
 
       addArtwork: (newArt) => set((state) => {
         const artwork: Artwork = {

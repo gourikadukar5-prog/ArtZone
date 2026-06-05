@@ -59,7 +59,7 @@ export function Navbar() {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  const { isAuthenticated, user, setUser } = useArtStore();
+  const { isAuthenticated, user, userAvatarUrl, setUser } = useArtStore();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -241,9 +241,13 @@ export function Navbar() {
                   <DropdownMenu.Trigger asChild>
                     <button className="flex items-center gap-2 px-1 py-1 rounded-full hover:bg-white/40 dark:hover:bg-charcoal-800/40 transition-colors outline-none ml-2 border border-transparent hover:border-warm-200 dark:hover:border-charcoal-700">
                       <Avatar.Root className="inline-flex items-center justify-center align-middle overflow-hidden select-none w-8 h-8 rounded-full bg-warm-200 dark:bg-charcoal-800 border border-warm-300 dark:border-charcoal-700">
-                        <Avatar.Fallback className="w-full h-full flex items-center justify-center bg-white dark:bg-charcoal-900 text-charcoal-900 dark:text-warm-100 text-xs font-medium uppercase">
-                          {user?.user_metadata?.full_name?.charAt(0) || 'U'}
-                        </Avatar.Fallback>
+                        {userAvatarUrl ? (
+                          <Avatar.Image src={userAvatarUrl} className="w-full h-full object-cover" alt="Profile" />
+                        ) : (
+                          <Avatar.Fallback className="w-full h-full flex items-center justify-center bg-white dark:bg-charcoal-900 text-charcoal-900 dark:text-warm-100 text-xs font-medium uppercase">
+                            {user?.user_metadata?.full_name?.charAt(0) || 'U'}
+                          </Avatar.Fallback>
+                        )}
                       </Avatar.Root>
                     </button>
                   </DropdownMenu.Trigger>

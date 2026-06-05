@@ -10,9 +10,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const supabase = createClient();
 
+    const fetchProfileAvatar = async (userId: string) => {
+      const { data } = await supabase.from("profiles").select("avatar_url").eq("id", userId).maybeSingle();
+      if (data?.avatar_url) {
+        useArtStore.getState().setUserAvatarUrl(data.avatar_url);
+      } else {
+        useArtStore.getState().setUserAvatarUrl(null);
+      }
+    };
+
     // Check active session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user || null);
+      if (session?.user) fetchProfileAvatar(session.user.id);
     });
 
     // Listen for auth changes
@@ -20,6 +30,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
+      if (session?.user) fetchProfileAvatar(session.user.id);
+      else useArtStore.getState().setUserAvatarUrl(null);
     });
 
     return () => {
