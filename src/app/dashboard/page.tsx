@@ -7,17 +7,17 @@ import {
   LayoutDashboard, Image as ImageIcon, FolderHeart, 
   Heart, BarChart3, Settings, Plus, Trash2, Edit2, 
   Eye, TrendingUp, Users, MessageSquare, BellRing,
-  MoreVertical, ChevronRight, LogOut, Activity,
+  ChevronRight, LogOut, Activity,
   PieChart as PieChartIcon, Award, Shield, Palette,
-  Bell, Lock, Mail, Smartphone, AlertTriangle, ArrowUpRight
+  Bell, Lock, AlertTriangle
 } from "lucide-react";
 import { formatNumber, cn } from "@/lib/utils";
 import { useArtStore } from "@/lib/store";
 import { fetchArtworks, deleteArtwork, ArtworkDB } from "@/lib/artworks";
 import { useRouter } from "next/navigation";
 import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
-  ResponsiveContainer, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell
+  ResponsiveContainer, PieChart, Pie, Cell,
+  Tooltip as RechartsTooltip
 } from 'recharts';
 
 const SIDEBAR_ITEMS = [
@@ -28,6 +28,17 @@ const SIDEBAR_ITEMS = [
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "community", label: "Community", icon: Users },
   { id: "settings", label: "Settings", icon: Settings },
+];
+
+// --- SETTINGS CATEGORIES ---
+const SETTINGS_CATEGORIES = [
+  { id: 'profile', label: 'Profile', icon: Users },
+  { id: 'appearance', label: 'Appearance', icon: Palette },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
+  { id: 'privacy', label: 'Privacy', icon: Lock },
+  { id: 'artwork', label: 'Artwork Preferences', icon: ImageIcon },
+  { id: 'security', label: 'Account & Security', icon: Shield },
+  { id: 'danger', label: 'Danger Zone', icon: AlertTriangle, danger: true },
 ];
 
 // --- REUSABLE COMPONENTS ---
@@ -51,7 +62,6 @@ export default function DashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
   const [activeSettingsTab, setActiveSettingsTab] = useState("profile");
-  const [timeFilter, setTimeFilter] = useState("7 Days");
   const [mounted, setMounted] = useState(false);
   const [myArtworks, setMyArtworks] = useState<ArtworkDB[]>([]);
   const [loading, setLoading] = useState(true);
