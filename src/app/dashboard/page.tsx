@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -9,7 +9,7 @@ import {
   Eye, TrendingUp, Users, MessageSquare, BellRing,
   ChevronRight, LogOut, Activity,
   PieChart as PieChartIcon, Award, Shield, Palette,
-  Bell, Lock, AlertTriangle, X, Check, UserPlus, UserCheck
+  Bell, Lock, AlertTriangle, X, Check, UserPlus, UserCheck, Camera, Loader2
 } from "lucide-react";
 import { formatNumber, cn } from "@/lib/utils";
 import { useArtStore } from "@/lib/store";
@@ -18,7 +18,7 @@ import {
   fetchCollections, createCollection, deleteCollection,
   fetchSavedArtworks, unsaveArtwork,
   fetchFollowerCount, fetchFollowingIds, followUser, unfollowUser,
-  fetchAllArtists, fetchProfile, upsertProfile,
+  fetchAllArtists, fetchProfile, upsertProfile, uploadProfileImage,
   buildMonthlyData,
   Collection, ArtistWithFollow, Profile,
 } from "@/lib/dashboard";
@@ -152,6 +152,14 @@ export default function DashboardPage() {
   const [savingCollection, setSavingCollection] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+
+  // Avatar upload state
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const { user, isAuthenticated } = useArtStore();
 
@@ -184,6 +192,7 @@ export default function DashboardPage() {
     setFollowerCount(fCount);
     setArtists(artistList);
     setProfile(prof);
+    setAvatarUrl(prof?.avatar_url || null);
     setProfileForm({
       display_name: prof?.display_name || user.user_metadata?.full_name || "",
       username: prof?.username || user.user_metadata?.full_name?.toLowerCase().replace(/\s+/g, "") || "",
@@ -268,9 +277,57 @@ export default function DashboardPage() {
   const handleSaveProfile = async () => {
     if (!user) return;
     setProfileSaving(true);
-    const ok = await upsertProfile({ id: user.id, ...profileForm });
-    if (ok) { setProfileSaved(true); setTimeout(() => setProfileSaved(false), 2000); }
+    setProfileError(null);
+    try {
+      let finalAvatarUrl = avatarUrl;
+
+      // Upload avatar if a new file is selected
+      if (avatarFile) {
+        setAvatarUploading(true);
+        const uploadedUrl = await uploadProfileImage(avatarFile, user.id, avatarUrl);
+        if (!uploadedUrl) {
+          setProfileError("Failed to upload profile picture. Please try again.");
+          setProfileSaving(false);
+          setAvatarUploading(false);
+          return;
+        }
+        finalAvatarUrl = uploadedUrl;
+        setAvatarUrl(uploadedUrl);
+        setAvatarFile(null);
+        setAvatarPreview(null);
+        setAvatarUploading(false);
+      }
+
+      const ok = await upsertProfile({ id: user.id, ...profileForm, avatar_url: finalAvatarUrl || undefined });
+      if (ok) {
+        setProfileSaved(true);
+        setTimeout(() => setProfileSaved(false), 2500);
+      } else {
+        setProfileError("Failed to update profile. Please try again.");
+      }
+    } catch (err: unknown) {
+      setProfileError(err instanceof Error ? err.message : "Failed to update profile.");
+    }
     setProfileSaving(false);
+  };
+
+  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      setProfileError("Invalid file type. Please use JPG, JPEG, PNG, or WEBP.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setProfileError("Image is too large. Maximum size is 5MB.");
+      return;
+    }
+    setProfileError(null);
+    setAvatarFile(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => setAvatarPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
   };
 
   if (!mounted || !isAuthenticated) return null;
@@ -294,11 +351,15 @@ export default function DashboardPage() {
         <div className="px-6 flex flex-col items-center mb-8 pb-8 border-b border-white/20 dark:border-white/10">
           <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-accent-terracotta to-[#D4A853] p-1 mb-4 shadow-lg">
             <div className="w-full h-full rounded-full bg-white dark:bg-charcoal-900 flex items-center justify-center overflow-hidden border-2 border-white dark:border-charcoal-900">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              {user?.user_metadata?.avatar_url
-                ? <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                : <span className="text-3xl font-display text-charcoal-900 dark:text-warm-100">{userName.charAt(0)}</span>
-              }
+              {avatarUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+              ) : user?.user_metadata?.avatar_url ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-3xl font-display text-charcoal-900 dark:text-warm-100">{userName.charAt(0).toUpperCase()}</span>
+              )}
             </div>
           </div>
           <h2 className="text-lg font-bold text-charcoal-900 dark:text-warm-100 mb-1 text-center">{userName}</h2>
@@ -331,10 +392,10 @@ export default function DashboardPage() {
           {/* Header */}
           <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div>
-              <h1 className="font-display font-semibold text-3xl md:text-4xl text-charcoal-900 dark:text-warm-100 mb-2 tracking-tight">
+              <h1 className="font-handwriting font-bold text-4xl md:text-5xl text-charcoal-900 dark:text-warm-100 mb-2">
                 Welcome back, {userName.split(" ")[0]}
               </h1>
-              <p className="text-charcoal-600 dark:text-charcoal-300 text-base">Here&apos;s a comprehensive overview of your creative journey.</p>
+              <p className="font-handwriting tracking-wide text-xl text-charcoal-600 dark:text-charcoal-300">Here&apos;s a comprehensive overview of your creative journey.</p>
             </div>
             <Link href="/upload" className="btn-primary py-3 px-6 inline-flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
               <Plus className="w-5 h-5" /> Upload Artwork
@@ -397,7 +458,7 @@ export default function DashboardPage() {
                     ) : (
                       <div className="h-[200px] flex flex-col items-center justify-center text-center">
                         <Activity className="w-10 h-10 text-charcoal-300 dark:text-charcoal-700 mb-3" />
-                        <p className="text-sm text-charcoal-500 dark:text-charcoal-400">Upload artworks to see your upload history.</p>
+                        <p className="font-handwriting tracking-wide text-xl text-charcoal-500 dark:text-charcoal-400">Upload artworks to see your upload history.</p>
                       </div>
                     )}
                   </GlassCard>
@@ -418,7 +479,7 @@ export default function DashboardPage() {
                         </ResponsiveContainer>
                         <div className="flex flex-wrap justify-center gap-x-3 gap-y-2 mt-2">
                           {realPieData.map((e, i) => (
-                            <div key={i} className="flex items-center gap-1.5 text-xs text-charcoal-600 dark:text-charcoal-300 font-medium">
+                            <div key={i} className="flex items-center gap-1.5 font-handwriting text-lg text-charcoal-600 dark:text-charcoal-300">
                               <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: e.color }} />
                               {e.name}
                             </div>
@@ -428,7 +489,7 @@ export default function DashboardPage() {
                     ) : (
                       <div className="flex-1 flex flex-col items-center justify-center text-center">
                         <PieChartIcon className="w-8 h-8 text-charcoal-300 dark:text-charcoal-700 mb-3" />
-                        <p className="text-sm text-charcoal-500 dark:text-charcoal-400">No categories to display.</p>
+                        <p className="font-handwriting tracking-wide text-xl text-charcoal-500 dark:text-charcoal-400">No categories to display.</p>
                       </div>
                     )}
                   </GlassCard>
@@ -497,17 +558,17 @@ export default function DashboardPage() {
                     <div className="space-y-4 mt-4">
                       <Link href="/upload" className="w-full flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-accent-terracotta to-[#D4A853] text-white hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
                         <div className="p-2 rounded-xl bg-white/20"><Plus className="w-5 h-5" /></div>
-                        <div className="text-left flex-1"><h4 className="font-bold text-sm">Upload Artwork</h4><p className="text-xs text-white/80">Share your latest creation</p></div>
+                        <div className="text-left flex-1"><h4 className="font-handwriting font-medium text-xl">Upload Artwork</h4><p className="font-handwriting text-lg text-white/80">Share your latest creation</p></div>
                         <ChevronRight className="w-5 h-5 opacity-70" />
                       </Link>
                       <button onClick={() => setActiveTab("collections")} className="w-full flex items-center gap-4 p-4 rounded-2xl bg-white/60 dark:bg-charcoal-800/60 hover:bg-white/90 dark:hover:bg-charcoal-700/80 border border-white/40 dark:border-white/10 transition-all duration-300 transform hover:-translate-y-1 text-charcoal-900 dark:text-warm-100">
                         <div className="p-2 rounded-xl bg-charcoal-100 dark:bg-charcoal-900"><FolderHeart className="w-5 h-5 text-[#5C6BC0]" /></div>
-                        <div className="text-left flex-1"><h4 className="font-bold text-sm">My Collections</h4><p className="text-xs text-charcoal-500 dark:text-charcoal-400">{collections.length} collections</p></div>
+                        <div className="text-left flex-1"><h4 className="font-handwriting font-medium text-xl text-charcoal-900 dark:text-warm-100">My Collections</h4><p className="font-handwriting text-lg text-charcoal-500 dark:text-charcoal-400">{collections.length} collections</p></div>
                         <ChevronRight className="w-5 h-5 text-charcoal-400" />
                       </button>
                       <button onClick={() => { setActiveTab("settings"); setActiveSettingsTab("profile"); }} className="w-full flex items-center gap-4 p-4 rounded-2xl bg-white/60 dark:bg-charcoal-800/60 hover:bg-white/90 dark:hover:bg-charcoal-700/80 border border-white/40 dark:border-white/10 transition-all duration-300 transform hover:-translate-y-1 text-charcoal-900 dark:text-warm-100">
                         <div className="p-2 rounded-xl bg-charcoal-100 dark:bg-charcoal-900"><Settings className="w-5 h-5 text-[#8FA68A]" /></div>
-                        <div className="text-left flex-1"><h4 className="font-bold text-sm">Edit Profile</h4><p className="text-xs text-charcoal-500 dark:text-charcoal-400">Update bio and links</p></div>
+                        <div className="text-left flex-1"><h4 className="font-handwriting font-medium text-xl text-charcoal-900 dark:text-warm-100">Edit Profile</h4><p className="font-handwriting text-lg text-charcoal-500 dark:text-charcoal-400">Update bio and links</p></div>
                         <ChevronRight className="w-5 h-5 text-charcoal-400" />
                       </button>
                     </div>
@@ -523,7 +584,7 @@ export default function DashboardPage() {
               <motion.div key="artworks" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} className="space-y-6">
                 <GlassCard className="p-6 md:p-8">
                   <SectionTitle title="My Artworks" icon={ImageIcon}
-                    action={<span className="text-sm font-semibold text-charcoal-500 dark:text-charcoal-400">{myArtworks.length} total</span>}
+                    action={<span className="font-handwriting text-xl text-charcoal-500 dark:text-charcoal-400">{myArtworks.length} total</span>}
                   />
                   {myArtworks.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -555,7 +616,7 @@ export default function DashboardPage() {
                   {/* Create Collection Modal */}
                   {showCreateCollection && (
                     <div className="mb-6 p-5 rounded-2xl bg-white/50 dark:bg-charcoal-800/50 border border-white/40 dark:border-white/10">
-                      <h3 className="font-semibold text-charcoal-900 dark:text-warm-100 mb-4">Create New Collection</h3>
+                      <h3 className="font-handwriting font-medium tracking-wide text-2xl text-charcoal-900 dark:text-warm-100 mb-4">Create New Collection</h3>
                       <div className="space-y-3">
                         <input
                           type="text"
@@ -615,7 +676,7 @@ export default function DashboardPage() {
               <motion.div key="saved" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} className="space-y-6">
                 <GlassCard className="p-6 md:p-8">
                   <SectionTitle title="Saved Artworks" icon={Heart}
-                    action={<span className="text-sm font-semibold text-charcoal-500 dark:text-charcoal-400">{savedArtworks.length} saved</span>}
+                    action={<span className="font-handwriting text-xl text-charcoal-500 dark:text-charcoal-400">{savedArtworks.length} saved</span>}
                   />
                   {savedArtworks.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -648,7 +709,7 @@ export default function DashboardPage() {
                         <div className="p-1.5 rounded-lg bg-white dark:bg-charcoal-900 shadow-sm border border-white/50 dark:border-white/10">
                           <s.icon className="w-4 h-4 text-charcoal-700 dark:text-warm-100" />
                         </div>
-                        <p className="text-xs font-semibold text-charcoal-600 dark:text-charcoal-300">{s.label}</p>
+                        <p className="font-handwriting tracking-wide text-xl text-charcoal-600 dark:text-charcoal-300">{s.label}</p>
                       </div>
                       <p className="text-2xl font-display font-bold text-charcoal-900 dark:text-warm-100">{formatNumber(s.value)}</p>
                     </GlassCard>
@@ -718,7 +779,7 @@ export default function DashboardPage() {
               <motion.div key="community" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} className="space-y-6">
                 <GlassCard className="p-6 md:p-8">
                   <SectionTitle title="Discover Artists" icon={Users}
-                    action={<span className="text-sm font-semibold text-charcoal-500 dark:text-charcoal-400">{artists.length} artists</span>}
+                    action={<span className="font-handwriting text-xl text-charcoal-500 dark:text-charcoal-400">{artists.length} artists</span>}
                   />
                   {artists.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -784,39 +845,95 @@ export default function DashboardPage() {
                     <GlassCard className="p-8">
                       <SectionTitle title="Public Profile" icon={Users} />
                       <div className="space-y-6">
-                        <div className="flex items-center gap-6">
-                          <div className="w-24 h-24 rounded-full bg-charcoal-200 dark:bg-charcoal-800 flex items-center justify-center overflow-hidden border-4 border-white dark:border-charcoal-900 shadow-lg">
-                            {user?.user_metadata?.avatar_url
-                              ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                              : <span className="text-3xl font-display text-charcoal-500 dark:text-charcoal-400">{userName.charAt(0)}</span>
-                            }
+                        {/* ── Avatar Upload ── */}
+                        <div className="flex items-start gap-6 pb-6 border-b border-white/20 dark:border-white/10">
+                          <div className="relative flex-shrink-0">
+                            <div className="w-28 h-28 rounded-full bg-gradient-to-tr from-accent-terracotta to-[#D4A853] p-1 shadow-lg">
+                              <div className="w-full h-full rounded-full bg-white dark:bg-charcoal-900 overflow-hidden">
+                                {avatarUploading ? (
+                                  <div className="w-full h-full flex items-center justify-center bg-charcoal-100 dark:bg-charcoal-800">
+                                    <Loader2 className="w-8 h-8 text-accent-terracotta animate-spin" />
+                                  </div>
+                                ) : avatarPreview ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+                                ) : avatarUrl ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : user?.user_metadata?.avatar_url ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                                ) : (
+                                  <span className="w-full h-full flex items-center justify-center text-4xl font-display text-charcoal-500 dark:text-charcoal-400">{userName.charAt(0).toUpperCase()}</span>
+                                )}
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => avatarInputRef.current?.click()}
+                              disabled={avatarUploading}
+                              className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-accent-terracotta text-white flex items-center justify-center shadow-lg hover:bg-accent-terracotta/90 transition-colors border-2 border-white dark:border-charcoal-900 disabled:opacity-50"
+                              title="Change profile picture"
+                            >
+                              <Camera className="w-4 h-4" />
+                            </button>
+                            <input
+                              ref={avatarInputRef}
+                              type="file"
+                              accept="image/jpeg,image/jpg,image/png,image/webp"
+                              className="hidden"
+                              onChange={handleAvatarFileChange}
+                            />
                           </div>
-                          <div>
-                            <p className="text-xs text-charcoal-500 dark:text-charcoal-400 font-medium">Profile picture is managed via your login provider.</p>
+                          <div className="flex-1 pt-2">
+                            <h4 className="font-handwriting font-medium tracking-wide text-2xl text-charcoal-900 dark:text-warm-100 mb-1">Profile Picture</h4>
+                            <p className="font-handwriting text-lg text-charcoal-500 dark:text-charcoal-400 mb-3">JPG, JPEG, PNG or WEBP — max 5MB</p>
+                            <button
+                              type="button"
+                              onClick={() => avatarInputRef.current?.click()}
+                              disabled={avatarUploading}
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-charcoal-200 dark:border-charcoal-700 text-sm font-medium text-charcoal-700 dark:text-charcoal-300 hover:bg-white/60 dark:hover:bg-charcoal-800/60 transition-colors disabled:opacity-50"
+                            >
+                              <Camera className="w-4 h-4" />
+                              {avatarFile ? "Change Selection" : "Choose Photo"}
+                            </button>
+                            {avatarFile && (
+                              <p className="mt-2 font-handwriting text-lg text-accent-terracotta dark:text-[#D4A853]">
+                                ✓ {avatarFile.name} selected — click Save Changes to upload
+                              </p>
+                            )}
                           </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
-                            <label className="text-sm font-bold text-charcoal-700 dark:text-charcoal-300">Display Name</label>
+                            <label className="font-handwriting tracking-wide text-xl text-charcoal-700 dark:text-charcoal-300">Display Name</label>
                             <input type="text" value={profileForm.display_name} onChange={e => setProfileForm(p => ({ ...p, display_name: e.target.value }))} className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-charcoal-900/50 border border-charcoal-200 dark:border-charcoal-800 focus:outline-none focus:ring-2 focus:ring-accent-terracotta text-sm text-charcoal-900 dark:text-warm-100" />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-sm font-bold text-charcoal-700 dark:text-charcoal-300">Username</label>
+                            <label className="font-handwriting tracking-wide text-xl text-charcoal-700 dark:text-charcoal-300">Username</label>
                             <input type="text" value={profileForm.username} onChange={e => setProfileForm(p => ({ ...p, username: e.target.value }))} className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-charcoal-900/50 border border-charcoal-200 dark:border-charcoal-800 focus:outline-none focus:ring-2 focus:ring-accent-terracotta text-sm text-charcoal-900 dark:text-warm-100" />
                           </div>
                           <div className="space-y-2 md:col-span-2">
-                            <label className="text-sm font-bold text-charcoal-700 dark:text-charcoal-300">Bio</label>
+                            <label className="font-handwriting tracking-wide text-xl text-charcoal-700 dark:text-charcoal-300">Bio</label>
                             <textarea rows={4} value={profileForm.bio} onChange={e => setProfileForm(p => ({ ...p, bio: e.target.value }))} placeholder="Tell the community about yourself..." className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-charcoal-900/50 border border-charcoal-200 dark:border-charcoal-800 focus:outline-none focus:ring-2 focus:ring-accent-terracotta text-sm text-charcoal-900 dark:text-warm-100 resize-none" />
                           </div>
                         </div>
+                        {/* Error & Success Messages */}
+                        {profileError && (
+                          <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400">
+                            <X className="w-4 h-4 flex-shrink-0" />
+                            <p className="font-handwriting text-xl">{profileError}</p>
+                          </div>
+                        )}
                         <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/20 dark:border-white/10">
                           {profileSaved && (
-                            <span className="flex items-center gap-1.5 text-sm text-green-600 dark:text-green-400 font-medium">
-                              <Check className="w-4 h-4" /> Saved!
+                            <span className="flex items-center gap-1.5 font-handwriting text-xl text-green-600 dark:text-green-400">
+                              <Check className="w-4 h-4" /> Profile updated successfully!
                             </span>
                           )}
-                          <button onClick={handleSaveProfile} disabled={profileSaving} className="btn-primary py-2.5 px-8 disabled:opacity-50">
-                            {profileSaving ? "Saving..." : "Save Changes"}
+                          <button onClick={handleSaveProfile} disabled={profileSaving || avatarUploading} className="btn-primary py-2.5 px-8 disabled:opacity-50 flex items-center gap-2">
+                            {(profileSaving || avatarUploading) && <Loader2 className="w-4 h-4 animate-spin" />}
+                            {profileSaving ? "Saving..." : avatarUploading ? "Uploading..." : "Save Changes"}
                           </button>
                         </div>
                       </div>
@@ -828,8 +945,8 @@ export default function DashboardPage() {
                       <div className="w-16 h-16 rounded-2xl bg-white/50 dark:bg-charcoal-800/50 flex items-center justify-center mb-4">
                         <Settings className="w-8 h-8 text-charcoal-400 dark:text-charcoal-500" />
                       </div>
-                      <h3 className="text-xl font-bold text-charcoal-900 dark:text-warm-100 mb-2 capitalize">{activeSettingsTab} Settings</h3>
-                      <p className="text-charcoal-500 dark:text-charcoal-400 text-sm max-w-sm">This section is coming soon.</p>
+                      <h3 className="font-handwriting tracking-wide text-3xl text-charcoal-900 dark:text-warm-100 mb-2 capitalize">{activeSettingsTab} Settings</h3>
+                      <p className="font-handwriting tracking-wide text-xl text-charcoal-500 dark:text-charcoal-400 max-w-sm">This section is coming soon.</p>
                     </GlassCard>
                   )}
                 </div>

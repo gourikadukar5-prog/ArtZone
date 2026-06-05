@@ -282,6 +282,56 @@ export async function unfollowUser(followerId: string, followingId: string): Pro
   return true;
 }
 
+// ─── Profile Image Upload ─────────────────────────────────────
+
+export async function uploadProfileImage(
+  file: File,
+  userId: string,
+  oldAvatarUrl?: string | null
+): Promise<string | null> {
+  const supabase = createClient();
+
+  // Validate file type
+  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error("Invalid file type. Only JPG, JPEG, PNG, and WEBP are supported.");
+  }
+
+  // Validate file size (max 5MB)
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    throw new Error("File is too large. Maximum size is 5MB.");
+  }
+
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const path = `${userId}/avatar.${ext}`;
+
+  // Delete old avatar from storage if it's from our bucket
+  if (oldAvatarUrl && oldAvatarUrl.includes("/profile-images/")) {
+    const oldPath = oldAvatarUrl.split("/profile-images/").pop();
+    if (oldPath) {
+      await supabase.storage.from("profile-images").remove([oldPath]);
+    }
+  }
+
+  // Upload new image
+  const { error } = await supabase.storage
+    .from("profile-images")
+    .upload(path, file, { upsert: true, cacheControl: "3600" });
+
+  if (error) {
+    console.error("uploadProfileImage error:", error.message);
+    return null;
+  }
+
+  // Get public URL
+  const { data: urlData } = supabase.storage
+    .from("profile-images")
+    .getPublicUrl(path);
+
+  return urlData?.publicUrl ?? null;
+}
+
 // ─── Profiles ────────────────────────────────────────────────
 
 export async function fetchProfile(userId: string): Promise<Profile | null> {
