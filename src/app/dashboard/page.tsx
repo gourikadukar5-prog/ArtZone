@@ -364,7 +364,7 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
-          <h2 className="font-handwriting tracking-wide text-3xl font-medium text-charcoal-900 dark:text-warm-100 mb-1 text-center">{userName}</h2>
+          <h2 className="font-handwriting font-medium tracking-wide text-lg text-charcoal-900 dark:text-warm-100 mb-1 text-center">{userName}</h2>
           <p className="text-sm text-charcoal-500 dark:text-charcoal-400 mb-2 text-center">{followerCount} Followers</p>
           <button onClick={() => { setActiveTab("settings"); setActiveSettingsTab("profile"); }} className="px-5 py-2 rounded-full bg-white/60 dark:bg-charcoal-800/60 hover:bg-white dark:hover:bg-charcoal-700 border border-white/40 dark:border-white/10 text-sm font-medium text-charcoal-900 dark:text-warm-100 transition-colors shadow-sm w-full">
             Edit Profile
