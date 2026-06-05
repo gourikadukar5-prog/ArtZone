@@ -13,6 +13,7 @@ export interface ArtworkDB {
   likes: number;
   comments: number;
   saves: number;
+  views?: number;
   created_at: string;
 }
 
@@ -29,6 +30,34 @@ export async function fetchArtworks(): Promise<ArtworkDB[]> {
     return [];
   }
   return data ?? [];
+}
+
+// ─── Fetch artwork by ID ────────────────────────────────
+export async function fetchArtworkById(id: string): Promise<ArtworkDB | null> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("artworks")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error("fetchArtworkById error:", error.message);
+    return null;
+  }
+  return data;
+}
+
+// ─── Increment views ────────────────────────────────────
+export async function incrementArtworkViews(id: string): Promise<void> {
+  const supabase = createClient();
+  // Using an RPC call if it exists, or just direct update if possible.
+  // Actually, Supabase doesn't easily let us increment directly without RPC or fetching first.
+  // We'll fetch and then update as a fallback if RPC isn't set up.
+  const { data } = await supabase.from("artworks").select("views").eq("id", id).single();
+  if (data) {
+    await supabase.from("artworks").update({ views: (data.views || 0) + 1 }).eq("id", id);
+  }
 }
 
 // ─── Upload image to Supabase Storage ───────────────────

@@ -106,6 +106,61 @@ export async function deleteCollection(collectionId: string, userId: string): Pr
   return true;
 }
 
+export async function fetchCollectionDetails(collectionId: string): Promise<{ collection: Collection | null, artworks: ArtworkDB[] }> {
+  const supabase = createClient();
+  const { data: collection, error: colError } = await supabase
+    .from("collections")
+    .select("*")
+    .eq("id", collectionId)
+    .single();
+
+  if (colError || !collection) {
+    console.error("fetchCollectionDetails error:", colError?.message);
+    return { collection: null, artworks: [] };
+  }
+
+  const { data: artworksData, error: artError } = await supabase
+    .from("collection_artworks")
+    .select("artworks(*)")
+    .eq("collection_id", collectionId)
+    .order("added_at", { ascending: false });
+
+  if (artError) {
+    console.error("fetchCollectionDetails artworks error:", artError.message);
+  }
+
+  const artworks = (artworksData ?? []).map((row: any) => row.artworks).filter(Boolean);
+  return { collection, artworks };
+}
+
+export async function addArtworkToCollection(collectionId: string, artworkId: string): Promise<boolean> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("collection_artworks")
+    .insert([{ collection_id: collectionId, artwork_id: artworkId }]);
+  
+  if (error) {
+    console.error("addArtworkToCollection error:", error.message);
+    return false;
+  }
+  return true;
+}
+
+export async function removeArtworkFromCollection(collectionId: string, artworkId: string): Promise<boolean> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("collection_artworks")
+    .delete()
+    .eq("collection_id", collectionId)
+    .eq("artwork_id", artworkId);
+  
+  if (error) {
+    console.error("removeArtworkFromCollection error:", error.message);
+    return false;
+  }
+  return true;
+}
+
 // ─── Saved Artworks ──────────────────────────────────────────
 
 export async function fetchSavedArtworks(userId: string): Promise<ArtworkDB[]> {

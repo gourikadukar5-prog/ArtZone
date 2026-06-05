@@ -586,7 +586,7 @@ export default function DashboardPage() {
                   {collections.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {collections.map(col => (
-                        <div key={col.id} className="group relative rounded-2xl border border-white/40 dark:border-white/10 bg-white/50 dark:bg-charcoal-800/50 p-5 hover:bg-white/80 dark:hover:bg-charcoal-700/60 transition-all duration-300">
+                        <Link href={`/collection/${col.id}`} key={col.id} className="group relative rounded-2xl border border-white/40 dark:border-white/10 bg-white/50 dark:bg-charcoal-800/50 p-5 hover:bg-white/80 dark:hover:bg-charcoal-700/60 transition-all duration-300 block">
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-terracotta to-[#D4A853] flex items-center justify-center mb-3 shadow-sm">
                             <FolderHeart className="w-5 h-5 text-white" />
                           </div>
@@ -594,11 +594,11 @@ export default function DashboardPage() {
                           {col.description && <p className="text-xs text-charcoal-500 dark:text-charcoal-400 mb-3 line-clamp-2">{col.description}</p>}
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-semibold text-charcoal-500 dark:text-charcoal-400">{col.artwork_count ?? 0} artworks</span>
-                            <button onClick={() => handleDeleteCollection(col.id)} className="p-1.5 rounded-lg text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all">
+                            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteCollection(col.id); }} className="p-1.5 rounded-lg text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all">
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
-                        </div>
+                        </Link>
                       ))}
                     </div>
                   ) : (
