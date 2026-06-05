@@ -304,7 +304,8 @@ export async function uploadProfileImage(
   }
 
   const ext = file.name.split(".").pop() ?? "jpg";
-  const path = `${userId}/avatar.${ext}`;
+  const timestamp = Date.now();
+  const path = `${userId}/avatar_${timestamp}.${ext}`;
 
   // Delete old avatar from storage if it's from our bucket
   if (oldAvatarUrl && oldAvatarUrl.includes("/profile-images/")) {
@@ -347,9 +348,18 @@ export async function fetchProfile(userId: string): Promise<Profile | null> {
 
 export async function upsertProfile(profile: Partial<Profile> & { id: string }): Promise<boolean> {
   const supabase = createClient();
-  const { error } = await supabase
-    .from("profiles")
-    .upsert([{ ...profile, updated_at: new Date().toISOString() }]);
+  // Build payload — always include avatar_url even if null so it is written explicitly
+  const payload: Record<string, unknown> = {
+    id: profile.id,
+    display_name: profile.display_name ?? "",
+    username: profile.username ?? "",
+    bio: profile.bio ?? "",
+  };
+  // Only include avatar_url when it is explicitly provided in the argument
+  if ("avatar_url" in profile) {
+    payload.avatar_url = profile.avatar_url ?? null;
+  }
+  const { error } = await supabase.from("profiles").upsert([payload]);
   if (error) { console.error("upsertProfile:", error.message); return false; }
   return true;
 }
