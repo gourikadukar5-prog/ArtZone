@@ -289,47 +289,61 @@ export async function uploadProfileImage(
   userId: string,
   oldAvatarUrl?: string | null
 ): Promise<string | null> {
+  console.log("[uploadProfileImage] Starting upload process for user:", userId);
   const supabase = createClient();
 
   // Validate file type
   const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
   if (!allowedTypes.includes(file.type)) {
+    console.error("[uploadProfileImage] Invalid file type:", file.type);
     throw new Error("Invalid file type. Only JPG, JPEG, PNG, and WEBP are supported.");
   }
 
   // Validate file size (max 5MB)
   const maxSize = 5 * 1024 * 1024;
   if (file.size > maxSize) {
+    console.error("[uploadProfileImage] File too large:", file.size);
     throw new Error("File is too large. Maximum size is 5MB.");
   }
 
   const ext = file.name.split(".").pop() ?? "jpg";
   const timestamp = Date.now();
   const path = `${userId}/avatar_${timestamp}.${ext}`;
+  console.log("[uploadProfileImage] Generated path:", path);
 
   // Delete old avatar from storage if it's from our bucket
   if (oldAvatarUrl && oldAvatarUrl.includes("/profile-images/")) {
     const oldPath = oldAvatarUrl.split("/profile-images/").pop();
     if (oldPath) {
-      await supabase.storage.from("profile-images").remove([oldPath]);
+      console.log("[uploadProfileImage] Attempting to delete old avatar:", oldPath);
+      const { error: removeError } = await supabase.storage.from("profile-images").remove([oldPath]);
+      if (removeError) {
+        console.warn("[uploadProfileImage] Failed to delete old avatar (this is usually non-fatal):", removeError.message);
+      } else {
+        console.log("[uploadProfileImage] Successfully deleted old avatar.");
+      }
     }
   }
 
+  console.log("[uploadProfileImage] Initiating Supabase storage upload...");
   // Upload new image
   const { error } = await supabase.storage
     .from("profile-images")
     .upload(path, file, { upsert: true, cacheControl: "3600" });
 
   if (error) {
-    console.error("uploadProfileImage error:", error.message);
-    return null;
+    console.error("[uploadProfileImage] FAILED! Supabase storage error:", error.message);
+    // Throw error so it gets caught by the UI and the exact message is visible
+    throw new Error(`Storage upload failed: ${error.message}`);
   }
 
+  console.log("[uploadProfileImage] Upload successful! Getting public URL...");
   // Get public URL
   const { data: urlData } = supabase.storage
     .from("profile-images")
     .getPublicUrl(path);
 
+  console.log("[uploadProfileImage] Generated public URL:", urlData?.publicUrl);
   return urlData?.publicUrl ?? null;
 }
 
