@@ -48,7 +48,9 @@ function SignupContent() {
     setLoading(true);
     const supabase = createClient();
 
-    console.log("[Signup] Attempting signUp for:", email);
+    console.log("[Signup] ── Starting signup ──────────────────────────");
+    console.log("[Signup] Email:", email.trim());
+    console.log("[Signup] Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
 
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: email.trim(),
@@ -61,32 +63,55 @@ function SignupContent() {
       },
     });
 
+    // Log the FULL raw response every time regardless of success/failure
+    console.log("[Signup] RAW data:", JSON.stringify(data, null, 2));
+    console.log("[Signup] RAW error:", JSON.stringify(signUpError, null, 2));
+
     if (signUpError) {
-      console.error("[Signup] signUp error:", signUpError.message, signUpError);
+      console.error("[Signup] signUp failed:", signUpError.message);
       setError(signUpError.message);
       setLoading(false);
       return;
     }
 
-    console.log("[Signup] signUp success. User:", data.user?.id, "Session:", data.session);
+    // ── Supabase Anti-Enumeration Check ─────────────────────────────────────
+    // When email is ALREADY REGISTERED, Supabase returns NO error but returns
+    // a user object with identities: [] (empty array). No user is created.
+    // Reference: https://supabase.com/docs/reference/javascript/auth-signup
+    const identities = data.user?.identities ?? [];
+    console.log("[Signup] user.id:", data.user?.id);
+    console.log("[Signup] user.identities length:", identities.length);
+    console.log("[Signup] user.email_confirmed_at:", data.user?.email_confirmed_at);
+    console.log("[Signup] session:", data.session ? "EXISTS" : "NULL");
 
-    // Also upsert the profile row immediately (in case the DB trigger doesn't exist)
+    if (identities.length === 0) {
+      // Email already exists — Supabase faked success to prevent enumeration
+      console.warn("[Signup] Fake success detected: identities is empty. Email already registered.");
+      setError("An account with this email already exists. Please log in instead.");
+      setLoading(false);
+      return;
+    }
+
+    console.log("[Signup] Real user created. ID:", data.user?.id);
+
+    // Upsert profile row immediately (in case the DB trigger doesn't exist)
     if (data.user) {
       const { error: profileError } = await supabase.from("profiles").upsert({
         id: data.user.id,
         display_name: displayName.trim(),
         username: username.trim(),
       });
-      if (profileError) {
-        console.warn("[Signup] Profile upsert error (non-fatal):", profileError.message);
-      }
+      console.log("[Signup] Profile upsert error:", profileError?.message ?? "none");
     }
 
-    // If email confirmation is required, Supabase returns a user but no session
     if (data.session) {
-      console.log("[Signup] Session created immediately, redirecting…");
+      // Email confirmations are DISABLED — user is logged in immediately
+      console.log("[Signup] Session created immediately, redirecting to dashboard…");
       router.push(next || "/dashboard");
+      router.refresh();
     } else {
+      // Email confirmations are ENABLED — user must click the link in their inbox
+      console.log("[Signup] Email confirmation required. Showing message.");
       setSuccess(
         "Account created! Please check your email and click the confirmation link to activate your account."
       );
