@@ -31,7 +31,7 @@ export async function fetchArtworks(): Promise<ArtworkDB[]> {
   }
 
   // Fetch latest profiles for all artworks
-  const userIds = [...new Set(data.map((a) => a.user_id))];
+  const userIds = Array.from(new Set(data.map((a) => a.user_id)));
   if (userIds.length > 0) {
     const { data: profiles } = await supabase
       .from("profiles")
