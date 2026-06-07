@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 
 export default function ArtworkDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const { user } = useArtStore();
+  const { user, userAvatarUrl } = useArtStore();
   const [artwork, setArtwork] = useState<ArtworkDB | null>(null);
   const [relatedArtworks, setRelatedArtworks] = useState<ArtworkDB[]>([]);
   
@@ -143,6 +143,27 @@ export default function ArtworkDetailPage({ params }: { params: { id: string } }
     setColLoading(false);
   };
 
+  const handleShare = async () => {
+    const url = `${window.location.origin}/artwork/${params.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: artwork?.title || "Artwork on ArtZone",
+          url,
+        });
+      } catch {
+        // User cancelled share — do nothing
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success("Artwork link copied successfully.");
+      } catch {
+        toast.error("Could not copy link. Please copy the URL manually.");
+      }
+    }
+  };
+
   const handleAddToCollection = async (collectionId: string) => {
     if (!user || !artwork) return;
     const ok = await addArtworkToCollection(collectionId, artwork.id);
@@ -238,7 +259,7 @@ export default function ArtworkDetailPage({ params }: { params: { id: string } }
             <button onClick={handleSave} className={cn("btn-ghost p-2 rounded-lg transition-colors", isSaved ? "text-[#5C6BC0]" : "text-charcoal-500")}>
               <Bookmark className={cn("w-5 h-5", isSaved && "fill-current")} />
             </button>
-            <button className="btn-ghost p-2 rounded-lg text-charcoal-500">
+            <button onClick={handleShare} className="btn-ghost p-2 rounded-lg text-charcoal-500 hover:text-charcoal-900 dark:hover:text-warm-100 transition-colors" title="Share artwork">
               <Share2 className="w-5 h-5" />
             </button>
           </div>
@@ -323,7 +344,10 @@ export default function ArtworkDetailPage({ params }: { params: { id: string } }
                 </h4>
                 <div className="flex gap-3 mb-6">
                   <div className="w-8 h-8 rounded-full bg-warm-200 dark:bg-charcoal-800 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                    {user?.user_metadata?.avatar_url ? (
+                    {userAvatarUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={userAvatarUrl} alt="You" className="w-full h-full object-cover" />
+                    ) : user?.user_metadata?.avatar_url ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img src={user.user_metadata.avatar_url} alt="You" className="w-full h-full object-cover" />
                     ) : (

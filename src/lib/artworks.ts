@@ -25,11 +25,37 @@ export async function fetchArtworks(): Promise<ArtworkDB[]> {
     .select("*")
     .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("fetchArtworks error:", error.message);
+  if (error || !data) {
+    console.error("fetchArtworks error:", error?.message);
     return [];
   }
-  return data ?? [];
+
+  // Fetch latest profiles for all artworks
+  const userIds = [...new Set(data.map((a) => a.user_id))];
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, avatar_url, display_name, username")
+      .in("id", userIds);
+
+    if (profiles) {
+      const profileMap = new Map(profiles.map((p) => [p.id, p]));
+      return data.map((a) => {
+        const p = profileMap.get(a.user_id);
+        if (p) {
+          return {
+            ...a,
+            artist_avatar: p.avatar_url || a.artist_avatar,
+            artist_name: p.display_name || a.artist_name,
+            artist_username: p.username || a.artist_username,
+          };
+        }
+        return a;
+      });
+    }
+  }
+
+  return data;
 }
 
 // ─── Fetch artwork by ID ────────────────────────────────
@@ -41,10 +67,27 @@ export async function fetchArtworkById(id: string): Promise<ArtworkDB | null> {
     .eq("id", id)
     .single();
 
-  if (error) {
-    console.error("fetchArtworkById error:", error.message);
+  if (error || !data) {
+    console.error("fetchArtworkById error:", error?.message);
     return null;
   }
+
+  // Fetch latest profile
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("avatar_url, display_name, username")
+    .eq("id", data.user_id)
+    .single();
+
+  if (profile) {
+    return {
+      ...data,
+      artist_avatar: profile.avatar_url || data.artist_avatar,
+      artist_name: profile.display_name || data.artist_name,
+      artist_username: profile.username || data.artist_username,
+    };
+  }
+
   return data;
 }
 

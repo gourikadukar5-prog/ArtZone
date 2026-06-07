@@ -6,6 +6,7 @@ import { useArtStore } from "@/lib/store";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setUser = useArtStore((state) => state.setUser);
+  const setUserAvatarUrl = useArtStore((state) => state.setUserAvatarUrl);
 
   useEffect(() => {
     const supabase = createClient();
@@ -13,9 +14,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const fetchProfileAvatar = async (userId: string) => {
       const { data } = await supabase.from("profiles").select("avatar_url").eq("id", userId).maybeSingle();
       if (data?.avatar_url) {
-        useArtStore.getState().setUserAvatarUrl(data.avatar_url);
+        setUserAvatarUrl(data.avatar_url);
       } else {
-        useArtStore.getState().setUserAvatarUrl(null);
+        setUserAvatarUrl(null);
       }
     };
 
@@ -31,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
       if (session?.user) fetchProfileAvatar(session.user.id);
-      else useArtStore.getState().setUserAvatarUrl(null);
+      else setUserAvatarUrl(null);
     });
 
     return () => {

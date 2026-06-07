@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
-import { Search, Menu, X, Bell, User, Sun, Moon, LogIn, LogOut, LayoutDashboard, Image as ImageIcon } from "lucide-react";
+import { Search, Menu, X, Bell, User, Sun, Moon, LogIn, LogOut, LayoutDashboard, Image as ImageIcon, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Pacifico, Lilita_One } from "next/font/google";
 import { useArtStore } from "@/lib/store";
@@ -194,7 +194,6 @@ export function Navbar() {
                     aria-label="Notifications"
                   >
                     <Bell className="w-4 h-4" />
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-accent-terracotta rounded-full border-2 border-white dark:border-charcoal-900"></span>
                   </button>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Portal>
@@ -205,14 +204,9 @@ export function Navbar() {
                     <div className="px-3 py-2 border-b border-warm-100 dark:border-charcoal-800 mb-2">
                       <h3 className="text-sm font-semibold text-charcoal-900 dark:text-warm-100">Notifications</h3>
                     </div>
-                    <DropdownMenu.Item className="flex flex-col outline-none cursor-pointer rounded-xl px-3 py-2 hover:bg-warm-100/50 dark:hover:bg-charcoal-800/50 focus:bg-warm-100/50 dark:focus:bg-charcoal-800/50 transition-colors">
-                      <span className="text-sm font-medium text-charcoal-900 dark:text-warm-100">Alex liked your sketch</span>
-                      <span className="text-xs text-charcoal-500 dark:text-charcoal-400 mt-0.5">2 hours ago</span>
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item className="flex flex-col outline-none cursor-pointer rounded-xl px-3 py-2 hover:bg-warm-100/50 dark:hover:bg-charcoal-800/50 focus:bg-warm-100/50 dark:focus:bg-charcoal-800/50 transition-colors">
-                      <span className="text-sm font-medium text-charcoal-900 dark:text-warm-100">New follower: Sarah</span>
-                      <span className="text-xs text-charcoal-500 dark:text-charcoal-400 mt-0.5">5 hours ago</span>
-                    </DropdownMenu.Item>
+                    <div className="py-4 px-3 text-center">
+                      <p className="text-sm font-medium text-charcoal-500 dark:text-charcoal-400">No Notifications Yet</p>
+                    </div>
                   </DropdownMenu.Content>
                 </DropdownMenu.Portal>
               </DropdownMenu.Root>
@@ -237,19 +231,23 @@ export function Navbar() {
                   </Link>
                 </>
               ) : (
-                <DropdownMenu.Root>
-                  <DropdownMenu.Trigger asChild>
-                    <button className="flex items-center gap-2 px-1 py-1 rounded-full hover:bg-white/40 dark:hover:bg-charcoal-800/40 transition-colors outline-none ml-2 border border-transparent hover:border-warm-200 dark:hover:border-charcoal-700">
-                      <Avatar.Root className="inline-flex items-center justify-center align-middle overflow-hidden select-none w-8 h-8 rounded-full bg-warm-200 dark:bg-charcoal-800 border border-warm-300 dark:border-charcoal-700">
-                        {userAvatarUrl && (
-                          <Avatar.Image src={userAvatarUrl} className="w-full h-full object-cover" alt="Profile" />
-                        )}
-                        <Avatar.Fallback className="w-full h-full flex items-center justify-center bg-white dark:bg-charcoal-900 text-charcoal-900 dark:text-warm-100 text-xs font-medium uppercase">
-                          {user?.user_metadata?.full_name?.charAt(0) || 'U'}
-                        </Avatar.Fallback>
-                      </Avatar.Root>
-                    </button>
-                  </DropdownMenu.Trigger>
+                <div className="flex items-center ml-2">
+                  <Link href="/dashboard" className="rounded-full outline-none hover:ring-2 hover:ring-warm-200 dark:hover:ring-charcoal-700 transition-all">
+                    <Avatar.Root className="inline-flex items-center justify-center align-middle overflow-hidden select-none w-8 h-8 rounded-full bg-warm-200 dark:bg-charcoal-800 border border-warm-300 dark:border-charcoal-700">
+                      {userAvatarUrl && (
+                        <Avatar.Image src={userAvatarUrl} className="w-full h-full object-cover" alt="Profile" />
+                      )}
+                      <Avatar.Fallback className="w-full h-full flex items-center justify-center bg-white dark:bg-charcoal-900 text-charcoal-900 dark:text-warm-100 text-xs font-medium uppercase">
+                        {user?.user_metadata?.full_name?.charAt(0) || 'U'}
+                      </Avatar.Fallback>
+                    </Avatar.Root>
+                  </Link>
+                  <DropdownMenu.Root>
+                    <DropdownMenu.Trigger asChild>
+                      <button className="flex items-center justify-center p-1 rounded-full hover:bg-white/40 dark:hover:bg-charcoal-800/40 transition-colors outline-none ml-1 text-charcoal-500 hover:text-charcoal-900 dark:hover:text-warm-100">
+                        <ChevronDown className="w-4 h-4" />
+                      </button>
+                    </DropdownMenu.Trigger>
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content
                       className="z-[100] min-w-[200px] bg-white/80 dark:bg-charcoal-900/80 backdrop-blur-xl border border-warm-200/50 dark:border-charcoal-800/50 rounded-2xl p-2 shadow-xl animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-2 mt-2 mr-4"
@@ -278,6 +276,7 @@ export function Navbar() {
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
+              </div>
               )}
             </div>
 
