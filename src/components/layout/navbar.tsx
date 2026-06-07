@@ -255,30 +255,16 @@ export function Navbar() {
                       className="z-[100] min-w-[200px] bg-white/80 dark:bg-charcoal-900/80 backdrop-blur-xl border border-warm-200/50 dark:border-charcoal-800/50 rounded-2xl p-2 shadow-xl animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-2 mt-2 mr-4"
                       sideOffset={5}
                     >
-                      <div className="px-3 py-2 border-b border-warm-100 dark:border-charcoal-800 mb-1">
-                        <p className="text-sm font-semibold text-charcoal-900 dark:text-warm-100 truncate">
-                          {user?.user_metadata?.full_name || 'Artist'}
-                        </p>
-                        <p className="text-xs text-charcoal-500 dark:text-charcoal-400 truncate">
-                          {user?.email}
-                        </p>
-                      </div>
-                      
                       <DropdownMenu.Item asChild>
-                        <Link href="/dashboard" className="flex items-center gap-2 outline-none cursor-pointer rounded-xl px-3 py-2 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-warm-100/50 dark:hover:bg-charcoal-800/50 focus:bg-warm-100/50 dark:focus:bg-charcoal-800/50 transition-colors mt-1">
-                          <LayoutDashboard className="w-4 h-4" />
-                          Dashboard
+                        <Link href="/dashboard" className="block px-3 py-2 border-b border-warm-100 dark:border-charcoal-800 mb-1 outline-none cursor-pointer hover:bg-warm-100/50 dark:hover:bg-charcoal-800/50 transition-colors rounded-t-xl">
+                          <p className="text-sm font-semibold text-charcoal-900 dark:text-warm-100 truncate">
+                            {user?.user_metadata?.full_name || 'Artist'}
+                          </p>
+                          <p className="text-xs text-charcoal-500 dark:text-charcoal-400 truncate">
+                            {user?.email}
+                          </p>
                         </Link>
                       </DropdownMenu.Item>
-                      
-                      <DropdownMenu.Item asChild>
-                        <Link href="/upload" className="flex items-center gap-2 outline-none cursor-pointer rounded-xl px-3 py-2 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-warm-100/50 dark:hover:bg-charcoal-800/50 focus:bg-warm-100/50 dark:focus:bg-charcoal-800/50 transition-colors">
-                          <ImageIcon className="w-4 h-4" />
-                          Upload Art
-                        </Link>
-                      </DropdownMenu.Item>
-
-                      <DropdownMenu.Separator className="h-px bg-warm-200/50 dark:bg-charcoal-800/50 my-1" />
 
                       <DropdownMenu.Item asChild>
                         <button
@@ -295,16 +281,14 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Mobile User Profile (only if auth) */}
-            {isAuthenticated && (
-              <Link
-                href="/dashboard"
-                className="lg:hidden p-2.5 rounded-full text-charcoal-600 dark:text-charcoal-400 hover:bg-white dark:hover:bg-charcoal-800 transition-colors shadow-sm bg-white/40 dark:bg-charcoal-900/40 backdrop-blur-sm ml-1"
-                aria-label="Profile"
-              >
-                <User className="w-4 h-4" />
-              </Link>
-            )}
+            {/* Mobile User Profile */}
+            <Link
+              href={isAuthenticated ? "/dashboard" : "/login"}
+              className="lg:hidden p-2.5 rounded-full text-charcoal-600 dark:text-charcoal-400 hover:bg-white dark:hover:bg-charcoal-800 transition-colors shadow-sm bg-white/40 dark:bg-charcoal-900/40 backdrop-blur-sm ml-1"
+              aria-label="Profile"
+            >
+              <User className="w-4 h-4" />
+            </Link>
 
             {/* Mobile Menu Toggle */}
             <button

@@ -364,16 +364,16 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
-          <h2 className="font-handwriting font-medium tracking-wide text-lg text-charcoal-900 dark:text-warm-100 mb-1 text-center">{userName}</h2>
-          <p className="text-sm text-charcoal-500 dark:text-charcoal-400 mb-2 text-center">{followerCount} Followers</p>
+          <h2 className="font-handwriting tracking-wide font-bold text-lg text-charcoal-900 dark:text-warm-100 mb-1 text-center">{userName}</h2>
+          <p className="font-handwriting tracking-wide text-sm text-charcoal-500 dark:text-charcoal-400 mb-2 text-center">{followerCount} Followers</p>
           <button onClick={() => { setActiveTab("settings"); setActiveSettingsTab("profile"); }} className="px-5 py-2 rounded-full bg-white/60 dark:bg-charcoal-800/60 hover:bg-white dark:hover:bg-charcoal-700 border border-white/40 dark:border-white/10 text-sm font-medium text-charcoal-900 dark:text-warm-100 transition-colors shadow-sm w-full">
             Edit Profile
           </button>
         </div>
         <div className="flex-1 space-y-1.5 px-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-charcoal-400 dark:text-charcoal-500 mb-4 pl-4">Menu</p>
+          <p className="font-handwriting tracking-wide text-sm font-semibold uppercase tracking-wider text-charcoal-400 dark:text-charcoal-500 mb-4 pl-4">Menu</p>
           {SIDEBAR_ITEMS.map(item => (
-            <button key={item.id} onClick={() => setActiveTab(item.id)} className={cn("w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300 relative group", activeTab === item.id ? "bg-white/80 text-charcoal-900 dark:bg-charcoal-800/80 dark:text-warm-100 shadow-sm" : "text-charcoal-600 dark:text-charcoal-400 hover:bg-white/50 dark:hover:bg-charcoal-800/50 hover:text-charcoal-900 dark:hover:text-warm-100")}>
+            <button key={item.id} onClick={() => setActiveTab(item.id)} className={cn("w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-handwriting tracking-wide text-lg font-medium transition-all duration-300 relative group", activeTab === item.id ? "bg-white/80 text-charcoal-900 dark:bg-charcoal-800/80 dark:text-warm-100 shadow-sm" : "text-charcoal-600 dark:text-charcoal-400 hover:bg-white/50 dark:hover:bg-charcoal-800/50 hover:text-charcoal-900 dark:hover:text-warm-100")}>
               {activeTab === item.id && (
                 <motion.div layoutId="activeSidebarIndicator" className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-accent-terracotta dark:bg-[#D4A853] rounded-r-full" />
               )}
@@ -382,7 +382,7 @@ export default function DashboardPage() {
             </button>
           ))}
           <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all duration-300 mt-8">
-            <LogOut className="w-5 h-5 opacity-70" /> Logout
+            <LogOut className="w-5 h-5 opacity-70" /> <span className="font-handwriting tracking-wide text-lg">Logout</span>
           </button>
         </div>
       </aside>
@@ -799,7 +799,7 @@ export default function DashboardPage() {
                           </div>
                           <button
                             onClick={() => artist.is_following ? handleUnfollow(artist.id) : handleFollow(artist.id)}
-                            className={cn("flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200",
+                            className={cn("flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-handwriting tracking-wide text-sm font-semibold transition-all duration-200",
                               artist.is_following
                                 ? "bg-charcoal-100 dark:bg-charcoal-700 text-charcoal-600 dark:text-charcoal-300 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/30"
                                 : "bg-accent-terracotta text-white hover:bg-accent-terracotta/90"
