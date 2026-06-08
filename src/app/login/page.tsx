@@ -43,38 +43,49 @@ function LoginContent() {
     const supabase = createClient();
 
     console.log("[Login] ── Starting login ──────────────────────────");
-    console.log("[Login] Email:", email.trim());
+    console.log("[Login] Email submitted:", `"${email.trim()}"`);
+    console.log("[Login] Password length:", password.length);
+    console.log("[Login] Password first/last chars:", password.charAt(0), "...", password.charAt(password.length - 1));
     console.log("[Login] Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
 
     const { data, error: signInError } = await supabase.auth.signInWithPassword({
       email: email.trim(),
-      password,
+      password, // NO transformation, NO trim, NO lowercase
     });
 
-    console.log("[Login] RAW data:", JSON.stringify(data, null, 2));
-    console.log("[Login] RAW error:", JSON.stringify(signInError, null, 2));
+    console.log("[Login] RAW Supabase Error Object:", signInError);
+    console.log("[Login] RAW Session Result:", data.session ? "Valid Session" : "No Session");
+    console.log("[Login] RAW User Result:", data.user?.id || "No User");
 
     if (signInError) {
-      console.error("[Login] signInWithPassword error details:", {
-        code: signInError.status || signInError.code,
-        message: signInError.message,
-        name: signInError.name
-      });
-      // Surface exact Supabase error to the user
-      if (signInError.message === "Invalid login credentials") {
-        setError("Incorrect email or password. Please try again.");
-      } else if (signInError.message.includes("Email not confirmed")) {
-        setError("Please confirm your email address before signing in. Check your inbox.");
-      } else {
-        setError(signInError.message);
-      }
+      console.error("[Login] Exact Error Message:", signInError.message);
+      console.error("[Login] Exact Error Code:", signInError.status || signInError.code);
+      
+      // We will now use the EXACT error message directly from Supabase 
+      // instead of our generic fallbacks, as requested.
+      setError(`Login failed: ${signInError.message}`);
       setLoading(false);
       return;
     }
 
-    console.log("[Login] signInWithPassword success. User:", data.user?.id);
-    router.push(next || "/dashboard");
-    router.refresh();
+    if (data.session) {
+      console.log("[Login] Success! Valid session created. Redirecting...");
+      // Fix redirect logic: ensure we push and then immediately refresh
+      // to ensure all server components see the new cookie.
+      try {
+        const destination = next || "/dashboard";
+        router.push(destination);
+        router.refresh(); // Crucial for @supabase/ssr cookie propagation
+      } catch (e) {
+        console.error("[Login] Redirect failed:", e);
+        // Fallback hard redirect if Next.js router fails
+        window.location.href = next || "/dashboard";
+      }
+    } else {
+      console.warn("[Login] signInWithPassword succeeded but no session was returned.");
+      setError("Login succeeded but no session was created. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
