@@ -285,7 +285,7 @@ export function Navbar() {
                       </DropdownMenu.Item>
 
                       <DropdownMenu.Item asChild>
-                        <Link href="/dashboard?tab=settings" className="w-full flex items-center gap-2 outline-none cursor-pointer rounded-xl px-3 py-2 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-warm-100/50 dark:hover:bg-charcoal-800/50 focus:bg-warm-100/50 transition-colors">
+                        <Link href="/dashboard?tab=edit-profile" className="w-full flex items-center gap-2 outline-none cursor-pointer rounded-xl px-3 py-2 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-warm-100/50 dark:hover:bg-charcoal-800/50 focus:bg-warm-100/50 transition-colors">
                           <User className="w-4 h-4" />
                           Edit Profile
                         </Link>

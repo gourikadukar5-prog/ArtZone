@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -41,12 +42,9 @@ const SIDEBAR_ITEMS = [
   { id: "analytics", label: "Analytics", icon: BarChart3, type: "tab" },
   { id: "notifications", label: "Notifications", icon: Bell, type: "tab" },
   { id: "community", label: "Messages", icon: MessageCircle, type: "tab" },
-  { id: "profile", label: "Profile", icon: User, type: "action", action: "profile" },
-  { id: "settings", label: "Settings", icon: Settings, type: "tab" },
 ];
 
 const SETTINGS_CATEGORIES = [
-  { id: "profile", label: "Profile", icon: Users },
   { id: "appearance", label: "Appearance", icon: Palette },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "privacy", label: "Privacy", icon: Lock },
@@ -134,11 +132,12 @@ const SavedCard = ({ art, onUnsave }: { art: ArtworkDB; onUnsave: () => void }) 
   </div>
 );
 
-// ─── MAIN COMPONENT ──────────────────────────────────────────
-export default function DashboardPage() {
+// ─── INNER COMPONENT (needs searchParams) ────────────────────
+function DashboardInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("overview");
-  const [activeSettingsTab, setActiveSettingsTab] = useState("profile");
+  const [activeSettingsTab, setActiveSettingsTab] = useState("appearance");
   const [mounted, setMounted] = useState(false);
 
   // Data states
@@ -173,6 +172,14 @@ export default function DashboardPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // ── Sync tab from URL query params ────────────────────────
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "edit-profile" || tab === "settings") {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (mounted && !isAuthenticated) {
@@ -355,44 +362,18 @@ export default function DashboardPage() {
 
       {/* ── SIDEBAR ── */}
       <aside className="w-20 fixed top-[var(--nav-height)] bottom-0 left-0 border-r border-white/20 dark:border-white/10 bg-white/40 dark:bg-charcoal-950/60 backdrop-blur-2xl hidden lg:flex flex-col items-center py-6 z-10 overflow-y-auto custom-scrollbar">
-        {/* Profile Avatar Top */}
-        <div className="mb-6 pb-6 border-b border-white/20 dark:border-white/10 w-full flex justify-center">
-          <button 
-            onClick={() => { setActiveTab("settings"); setActiveSettingsTab("profile"); }}
-            className="w-12 h-12 rounded-full overflow-hidden border-2 border-white dark:border-charcoal-900 shadow-md hover:ring-2 hover:ring-accent-terracotta transition-all"
-            title="Profile"
-          >
-            {avatarUrl ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
-            ) : user?.user_metadata?.avatar_url ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-tr from-accent-terracotta to-[#D4A853] flex items-center justify-center text-white font-display text-lg">
-                {userName.charAt(0).toUpperCase()}
-              </div>
-            )}
-          </button>
-        </div>
-
         <div className="flex-1 space-y-4 w-full flex flex-col items-center">
           {SIDEBAR_ITEMS.map(item => {
-            const isActive = activeTab === item.id || (item.type === 'action' && item.action === 'profile' && activeTab === 'settings' && activeSettingsTab === 'profile');
+            const isActive = activeTab === item.id;
             return (
-              <button 
-                key={item.id} 
+              <button
+                key={item.id}
                 onClick={() => {
                   if (item.type === "link" && item.href) router.push(item.href);
-                  else if (item.type === "action" && item.action === "profile") {
-                    setActiveTab("settings");
-                    setActiveSettingsTab("profile");
-                  } else {
-                    setActiveTab(item.id);
-                  }
-                }} 
+                  else setActiveTab(item.id);
+                }}
                 className={cn(
-                  "w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 relative group", 
+                  "w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 relative group",
                   isActive ? "bg-charcoal-900 text-white dark:bg-warm-100 dark:text-charcoal-900 shadow-md" : "text-charcoal-600 dark:text-charcoal-400 hover:bg-white/60 dark:hover:bg-charcoal-800 hover:text-charcoal-900 dark:hover:text-warm-100"
                 )}
               >
@@ -853,6 +834,108 @@ export default function DashboardPage() {
             )}
 
             {/* ═══════════════════════════════════════
+                EDIT PROFILE
+            ═══════════════════════════════════════ */}
+            {activeTab === "edit-profile" && (
+              <motion.div key="edit-profile" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+                <GlassCard className="p-8 max-w-3xl">
+                  <SectionTitle title="Edit Profile" icon={User} />
+                  <div className="space-y-6">
+                    {/* ── Avatar Upload ── */}
+                    <div className="flex items-start gap-6 pb-6 border-b border-white/20 dark:border-white/10">
+                      <div className="relative flex-shrink-0">
+                        <div className="w-28 h-28 rounded-full bg-gradient-to-tr from-accent-terracotta to-[#D4A853] p-1 shadow-lg">
+                          <div className="w-full h-full rounded-full bg-white dark:bg-charcoal-900 overflow-hidden">
+                            {avatarUploading ? (
+                              <div className="w-full h-full flex items-center justify-center bg-charcoal-100 dark:bg-charcoal-800">
+                                <Loader2 className="w-8 h-8 text-accent-terracotta animate-spin" />
+                              </div>
+                            ) : avatarPreview ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+                            ) : avatarUrl ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                            ) : user?.user_metadata?.avatar_url ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="w-full h-full flex items-center justify-center text-4xl font-display text-charcoal-500 dark:text-charcoal-400">{userName.charAt(0).toUpperCase()}</span>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => avatarInputRef.current?.click()}
+                          disabled={avatarUploading}
+                          className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-accent-terracotta text-white flex items-center justify-center shadow-lg hover:bg-accent-terracotta/90 transition-colors border-2 border-white dark:border-charcoal-900 disabled:opacity-50"
+                          title="Change profile picture"
+                        >
+                          <Camera className="w-4 h-4" />
+                        </button>
+                        <input
+                          ref={avatarInputRef}
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png,image/webp"
+                          className="hidden"
+                          onChange={handleAvatarFileChange}
+                        />
+                      </div>
+                      <div className="flex-1 pt-2">
+                        <h4 className="font-sans font-light tracking-wide text-2xl text-charcoal-900 dark:text-warm-100 mb-3">Profile Picture</h4>
+                        <button
+                          type="button"
+                          onClick={() => avatarInputRef.current?.click()}
+                          disabled={avatarUploading}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-charcoal-200 dark:border-charcoal-700 text-sm font-medium text-charcoal-700 dark:text-charcoal-300 hover:bg-white/60 dark:hover:bg-charcoal-800/60 transition-colors disabled:opacity-50"
+                        >
+                          <Camera className="w-4 h-4" />
+                          {avatarFile ? "Change Selection" : "Choose Photo"}
+                        </button>
+                        {avatarFile && (
+                          <p className="mt-2 font-display capitalize text-lg text-accent-terracotta dark:text-[#D4A853]">
+                            ✓ {avatarFile.name} selected — click Save Changes to upload
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="font-sans font-light tracking-wide text-xl text-charcoal-700 dark:text-charcoal-300">Display Name</label>
+                        <input type="text" value={profileForm.display_name} onChange={e => setProfileForm(p => ({ ...p, display_name: e.target.value }))} className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-charcoal-900/50 border border-charcoal-200 dark:border-charcoal-800 focus:outline-none focus:ring-2 focus:ring-accent-terracotta text-sm text-charcoal-900 dark:text-warm-100" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="font-sans font-light tracking-wide text-xl text-charcoal-700 dark:text-charcoal-300">Username</label>
+                        <input type="text" value={profileForm.username} onChange={e => setProfileForm(p => ({ ...p, username: e.target.value }))} className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-charcoal-900/50 border border-charcoal-200 dark:border-charcoal-800 focus:outline-none focus:ring-2 focus:ring-accent-terracotta text-sm text-charcoal-900 dark:text-warm-100" />
+                      </div>
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="font-sans font-light tracking-wide text-xl text-charcoal-700 dark:text-charcoal-300">Bio</label>
+                        <textarea rows={4} value={profileForm.bio} onChange={e => setProfileForm(p => ({ ...p, bio: e.target.value }))} placeholder="Tell the community about yourself..." className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-charcoal-900/50 border border-charcoal-200 dark:border-charcoal-800 focus:outline-none focus:ring-2 focus:ring-accent-terracotta text-sm text-charcoal-900 dark:text-warm-100 resize-none" />
+                      </div>
+                    </div>
+                    {profileError && (
+                      <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400">
+                        <X className="w-4 h-4 flex-shrink-0" />
+                        <p className="font-display capitalize text-xl">{profileError}</p>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/20 dark:border-white/10">
+                      {profileSaved && (
+                        <span className="flex items-center gap-1.5 font-display capitalize text-xl text-green-600 dark:text-green-400">
+                          <Check className="w-4 h-4" /> Profile updated successfully!
+                        </span>
+                      )}
+                      <button onClick={handleSaveProfile} disabled={profileSaving || avatarUploading} className="btn-primary py-2.5 px-8 disabled:opacity-50 flex items-center gap-2">
+                        {(profileSaving || avatarUploading) && <Loader2 className="w-4 h-4 animate-spin" />}
+                        {profileSaving ? "Saving..." : avatarUploading ? "Uploading..." : "Save Changes"}
+                      </button>
+                    </div>
+                  </div>
+                </GlassCard>
+              </motion.div>
+            )}
+
+            {/* ═══════════════════════════════════════
                 SETTINGS
             ═══════════════════════════════════════ */}
             {activeTab === "settings" && (
@@ -875,113 +958,13 @@ export default function DashboardPage() {
                 </GlassCard>
 
                 <div className="lg:col-span-3 space-y-6">
-                  {activeSettingsTab === "profile" && (
-                    <GlassCard className="p-8">
-                      <SectionTitle title="Public Profile" icon={Users} />
-                      <div className="space-y-6">
-                        {/* ── Avatar Upload ── */}
-                        <div className="flex items-start gap-6 pb-6 border-b border-white/20 dark:border-white/10">
-                          <div className="relative flex-shrink-0">
-                            <div className="w-28 h-28 rounded-full bg-gradient-to-tr from-accent-terracotta to-[#D4A853] p-1 shadow-lg">
-                              <div className="w-full h-full rounded-full bg-white dark:bg-charcoal-900 overflow-hidden">
-                                {avatarUploading ? (
-                                  <div className="w-full h-full flex items-center justify-center bg-charcoal-100 dark:bg-charcoal-800">
-                                    <Loader2 className="w-8 h-8 text-accent-terracotta animate-spin" />
-                                  </div>
-                                ) : avatarPreview ? (
-                                  // eslint-disable-next-line @next/next/no-img-element
-                                  <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
-                                ) : avatarUrl ? (
-                                  // eslint-disable-next-line @next/next/no-img-element
-                                  <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                                ) : user?.user_metadata?.avatar_url ? (
-                                  // eslint-disable-next-line @next/next/no-img-element
-                                  <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                                ) : (
-                                  <span className="w-full h-full flex items-center justify-center text-4xl font-display text-charcoal-500 dark:text-charcoal-400">{userName.charAt(0).toUpperCase()}</span>
-                                )}
-                              </div>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => avatarInputRef.current?.click()}
-                              disabled={avatarUploading}
-                              className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-accent-terracotta text-white flex items-center justify-center shadow-lg hover:bg-accent-terracotta/90 transition-colors border-2 border-white dark:border-charcoal-900 disabled:opacity-50"
-                              title="Change profile picture"
-                            >
-                              <Camera className="w-4 h-4" />
-                            </button>
-                            <input
-                              ref={avatarInputRef}
-                              type="file"
-                              accept="image/jpeg,image/jpg,image/png,image/webp"
-                              className="hidden"
-                              onChange={handleAvatarFileChange}
-                            />
-                          </div>
-                          <div className="flex-1 pt-2">
-                            <h4 className="font-sans font-light tracking-wide text-2xl text-charcoal-900 dark:text-warm-100 mb-3">Profile Picture</h4>
-                            <button
-                              type="button"
-                              onClick={() => avatarInputRef.current?.click()}
-                              disabled={avatarUploading}
-                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-charcoal-200 dark:border-charcoal-700 text-sm font-medium text-charcoal-700 dark:text-charcoal-300 hover:bg-white/60 dark:hover:bg-charcoal-800/60 transition-colors disabled:opacity-50"
-                            >
-                              <Camera className="w-4 h-4" />
-                              {avatarFile ? "Change Selection" : "Choose Photo"}
-                            </button>
-                            {avatarFile && (
-                              <p className="mt-2 font-display capitalize text-lg text-accent-terracotta dark:text-[#D4A853]">
-                                ✓ {avatarFile.name} selected — click Save Changes to upload
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="space-y-2">
-                            <label className="font-sans font-light tracking-wide text-xl text-charcoal-700 dark:text-charcoal-300">Display Name</label>
-                            <input type="text" value={profileForm.display_name} onChange={e => setProfileForm(p => ({ ...p, display_name: e.target.value }))} className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-charcoal-900/50 border border-charcoal-200 dark:border-charcoal-800 focus:outline-none focus:ring-2 focus:ring-accent-terracotta text-sm text-charcoal-900 dark:text-warm-100" />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="font-sans font-light tracking-wide text-xl text-charcoal-700 dark:text-charcoal-300">Username</label>
-                            <input type="text" value={profileForm.username} onChange={e => setProfileForm(p => ({ ...p, username: e.target.value }))} className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-charcoal-900/50 border border-charcoal-200 dark:border-charcoal-800 focus:outline-none focus:ring-2 focus:ring-accent-terracotta text-sm text-charcoal-900 dark:text-warm-100" />
-                          </div>
-                          <div className="space-y-2 md:col-span-2">
-                            <label className="font-sans font-light tracking-wide text-xl text-charcoal-700 dark:text-charcoal-300">Bio</label>
-                            <textarea rows={4} value={profileForm.bio} onChange={e => setProfileForm(p => ({ ...p, bio: e.target.value }))} placeholder="Tell the community about yourself..." className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-charcoal-900/50 border border-charcoal-200 dark:border-charcoal-800 focus:outline-none focus:ring-2 focus:ring-accent-terracotta text-sm text-charcoal-900 dark:text-warm-100 resize-none" />
-                          </div>
-                        </div>
-                        {/* Error & Success Messages */}
-                        {profileError && (
-                          <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400">
-                            <X className="w-4 h-4 flex-shrink-0" />
-                            <p className="font-display capitalize text-xl">{profileError}</p>
-                          </div>
-                        )}
-                        <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/20 dark:border-white/10">
-                          {profileSaved && (
-                            <span className="flex items-center gap-1.5 font-display capitalize text-xl text-green-600 dark:text-green-400">
-                              <Check className="w-4 h-4" /> Profile updated successfully!
-                            </span>
-                          )}
-                          <button onClick={handleSaveProfile} disabled={profileSaving || avatarUploading} className="btn-primary py-2.5 px-8 disabled:opacity-50 flex items-center gap-2">
-                            {(profileSaving || avatarUploading) && <Loader2 className="w-4 h-4 animate-spin" />}
-                            {profileSaving ? "Saving..." : avatarUploading ? "Uploading..." : "Save Changes"}
-                          </button>
-                        </div>
-                      </div>
-                    </GlassCard>
-                  )}
-
-                  {activeSettingsTab !== "profile" && (
-                    <GlassCard className="p-8 min-h-[400px] flex flex-col items-center justify-center text-center">
-                      <div className="w-16 h-16 rounded-2xl bg-white/50 dark:bg-charcoal-800/50 flex items-center justify-center mb-4">
-                        <Settings className="w-8 h-8 text-charcoal-400 dark:text-charcoal-500" />
-                      </div>
-                      <h3 className="font-sans font-light tracking-wide text-3xl text-charcoal-900 dark:text-warm-100 mb-2 capitalize">{activeSettingsTab} Settings</h3>
-                      <p className="font-sans font-light tracking-wide text-xl text-charcoal-500 dark:text-charcoal-400 max-w-sm">This section is coming soon.</p>
-                    </GlassCard>
-                  )}
+                  <GlassCard className="p-8 min-h-[400px] flex flex-col items-center justify-center text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-white/50 dark:bg-charcoal-800/50 flex items-center justify-center mb-4">
+                      <Settings className="w-8 h-8 text-charcoal-400 dark:text-charcoal-500" />
+                    </div>
+                    <h3 className="font-sans font-light tracking-wide text-3xl text-charcoal-900 dark:text-warm-100 mb-2 capitalize">{activeSettingsTab} Settings</h3>
+                    <p className="font-sans font-light tracking-wide text-xl text-charcoal-500 dark:text-charcoal-400 max-w-sm">This section is coming soon.</p>
+                  </GlassCard>
                 </div>
               </motion.div>
             )}
@@ -990,5 +973,14 @@ export default function DashboardPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+// ─── MAIN EXPORT (Suspense boundary for useSearchParams) ─────
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-transparent pt-[var(--nav-height)] flex items-center justify-center"><div className="w-12 h-12 border-4 border-[#D4A853] border-t-transparent rounded-full animate-spin" /></div>}>
+      <DashboardInner />
+    </Suspense>
   );
 }
