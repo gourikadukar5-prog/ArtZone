@@ -405,15 +405,6 @@ export default function DashboardPage() {
             );
           })}
         </div>
-
-        <div className="mt-6 pt-6 border-t border-white/20 dark:border-white/10 w-full flex justify-center">
-          <button className="w-12 h-12 flex items-center justify-center rounded-full text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all duration-300 relative group">
-            <LogOut className="w-6 h-6 group-hover:scale-110 transition-transform" />
-            <span className="absolute left-16 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 shadow-xl whitespace-nowrap z-50">
-              Logout
-            </span>
-          </button>
-        </div>
       </aside>
 
       {/* ── MAIN ── */}
@@ -929,8 +920,7 @@ export default function DashboardPage() {
                             />
                           </div>
                           <div className="flex-1 pt-2">
-                            <h4 className="font-sans font-light tracking-wide text-2xl text-charcoal-900 dark:text-warm-100 mb-1">Profile Picture</h4>
-                            <p className="font-display capitalize text-lg text-charcoal-500 dark:text-charcoal-400 mb-3">JPG, JPEG, PNG or WEBP — max 5MB</p>
+                            <h4 className="font-sans font-light tracking-wide text-2xl text-charcoal-900 dark:text-warm-100 mb-3">Profile Picture</h4>
                             <button
                               type="button"
                               onClick={() => avatarInputRef.current?.click()}

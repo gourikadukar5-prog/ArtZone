@@ -91,6 +91,7 @@ export function Navbar() {
   }, [pathname]);
 
   const isAuthPage = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+  const isDashboardPage = pathname.startsWith("/dashboard");
 
   if (isAuthPage) {
     return (
@@ -124,51 +125,73 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-2">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
-                  pathname === link.href && link.href !== "/" // Home is always active if path is /, but we'll simplify active state
-                    ? "text-charcoal-900 bg-white shadow-sm"
-                    : "text-white hover:text-charcoal-900 hover:bg-white/50"
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-            {isAuthenticated && (
-              <Link
-                href="/upload"
-                className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
-                  pathname === "/upload"
-                    ? "text-charcoal-900 bg-white shadow-sm"
-                    : "text-white hover:text-charcoal-900 hover:bg-white/50"
-                )}
-              >
-                Upload Art
-              </Link>
-            )}
-          </div>
+          {!isDashboardPage && (
+            <div className="hidden lg:flex items-center gap-2">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={cn(
+                    "px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
+                    pathname === link.href && link.href !== "/" // Home is always active if path is /, but we'll simplify active state
+                      ? "text-charcoal-900 bg-white shadow-sm"
+                      : "text-white hover:text-charcoal-900 hover:bg-white/50"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              {isAuthenticated && (
+                <Link
+                  href="/upload"
+                  className={cn(
+                    "px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
+                    pathname === "/upload"
+                      ? "text-charcoal-900 bg-white shadow-sm"
+                      : "text-white hover:text-charcoal-900 hover:bg-white/50"
+                  )}
+                >
+                  Upload Art
+                </Link>
+              )}
+            </div>
+          )}
+
+          {/* Dashboard Search */}
+          {isDashboardPage && (
+            <div className="flex-1 max-w-2xl mx-auto hidden sm:block px-6">
+              <form onSubmit={handleSearch} className="flex items-center bg-white/60 dark:bg-charcoal-900/60 hover:bg-white dark:hover:bg-charcoal-800 transition-colors duration-300 border border-warm-200 dark:border-charcoal-700 rounded-full px-4 py-2.5 focus-within:ring-2 focus-within:ring-charcoal-900/10 dark:focus-within:ring-warm-100/10 focus-within:bg-white shadow-sm w-full">
+                <button type="submit" className="flex items-center">
+                  <Search className="w-5 h-5 text-charcoal-400 mr-2 hover:text-charcoal-700 transition-colors" />
+                </button>
+                <input
+                  type="text"
+                  placeholder="Search drawings, mandala..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-transparent border-none outline-none text-base w-full text-charcoal-900 dark:text-warm-100 placeholder:text-charcoal-400"
+                />
+              </form>
+            </div>
+          )}
 
           {/* Right Actions */}
           <div className="flex items-center gap-1 md:gap-2">
             {/* Search */}
-            <form onSubmit={handleSearch} className="hidden sm:flex items-center bg-white/60 hover:bg-white transition-colors duration-300 border border-warm-200 rounded-full px-3 py-1.5 focus-within:ring-2 focus-within:ring-charcoal-900/10 focus-within:bg-white shadow-sm">
-              <button type="submit" className="flex items-center">
-                <Search className="w-4 h-4 text-charcoal-400 mr-2 hover:text-charcoal-700 transition-colors" />
-              </button>
-              <input
-                type="text"
-                placeholder="Search drawings, mandala..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent border-none outline-none text-sm w-36 md:w-48 text-charcoal-900 placeholder:text-charcoal-400"
-              />
-            </form>
+            {!isDashboardPage && (
+              <form onSubmit={handleSearch} className="hidden sm:flex items-center bg-white/60 hover:bg-white transition-colors duration-300 border border-warm-200 rounded-full px-3 py-1.5 focus-within:ring-2 focus-within:ring-charcoal-900/10 focus-within:bg-white shadow-sm">
+                <button type="submit" className="flex items-center">
+                  <Search className="w-4 h-4 text-charcoal-400 mr-2 hover:text-charcoal-700 transition-colors" />
+                </button>
+                <input
+                  type="text"
+                  placeholder="Search drawings, mandala..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-transparent border-none outline-none text-sm w-36 md:w-48 text-charcoal-900 placeholder:text-charcoal-400"
+                />
+              </form>
+            )}
 
             {/* Theme Toggle */}
             {mounted && (
@@ -232,20 +255,17 @@ export function Navbar() {
                 </>
               ) : (
                 <div className="flex items-center ml-2">
-                  <Link href="/dashboard" className="rounded-full outline-none hover:ring-2 hover:ring-warm-200 dark:hover:ring-charcoal-700 transition-all">
-                    <Avatar.Root className="inline-flex items-center justify-center align-middle overflow-hidden select-none w-8 h-8 rounded-full bg-warm-200 dark:bg-charcoal-800 border border-warm-300 dark:border-charcoal-700">
-                      {userAvatarUrl && (
-                        <Avatar.Image src={userAvatarUrl} className="w-full h-full object-cover" alt="Profile" />
-                      )}
-                      <Avatar.Fallback className="w-full h-full flex items-center justify-center bg-white dark:bg-charcoal-900 text-charcoal-900 dark:text-warm-100 text-xs font-medium uppercase">
-                        {user?.user_metadata?.full_name?.charAt(0) || 'U'}
-                      </Avatar.Fallback>
-                    </Avatar.Root>
-                  </Link>
                   <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
-                      <button className="flex items-center justify-center p-1 rounded-full hover:bg-white/40 dark:hover:bg-charcoal-800/40 transition-colors outline-none ml-1 text-charcoal-500 hover:text-charcoal-900 dark:hover:text-warm-100">
-                        <ChevronDown className="w-4 h-4" />
+                      <button className="rounded-full outline-none hover:ring-2 hover:ring-warm-200 dark:hover:ring-charcoal-700 transition-all focus:ring-2 focus:ring-accent-terracotta">
+                        <Avatar.Root className="inline-flex items-center justify-center align-middle overflow-hidden select-none w-10 h-10 rounded-full bg-warm-200 dark:bg-charcoal-800 border border-warm-300 dark:border-charcoal-700 cursor-pointer hover:shadow-md transition-shadow">
+                          {userAvatarUrl && (
+                            <Avatar.Image src={userAvatarUrl} className="w-full h-full object-cover" alt="Profile" />
+                          )}
+                          <Avatar.Fallback className="w-full h-full flex items-center justify-center bg-white dark:bg-charcoal-900 text-charcoal-900 dark:text-warm-100 text-sm font-medium uppercase">
+                            {user?.user_metadata?.full_name?.charAt(0) || 'U'}
+                          </Avatar.Fallback>
+                        </Avatar.Root>
                       </button>
                     </DropdownMenu.Trigger>
                   <DropdownMenu.Portal>
@@ -265,9 +285,23 @@ export function Navbar() {
                       </DropdownMenu.Item>
 
                       <DropdownMenu.Item asChild>
+                        <Link href="/dashboard?tab=settings" className="w-full flex items-center gap-2 outline-none cursor-pointer rounded-xl px-3 py-2 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-warm-100/50 dark:hover:bg-charcoal-800/50 focus:bg-warm-100/50 transition-colors">
+                          <User className="w-4 h-4" />
+                          Edit Profile
+                        </Link>
+                      </DropdownMenu.Item>
+
+                      <DropdownMenu.Item asChild>
+                        <Link href="/dashboard?tab=settings" className="w-full flex items-center gap-2 outline-none cursor-pointer rounded-xl px-3 py-2 text-sm text-charcoal-700 dark:text-charcoal-300 hover:bg-warm-100/50 dark:hover:bg-charcoal-800/50 focus:bg-warm-100/50 transition-colors">
+                          <Settings className="w-4 h-4" />
+                          Settings
+                        </Link>
+                      </DropdownMenu.Item>
+
+                      <DropdownMenu.Item asChild>
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-2 outline-none cursor-pointer rounded-xl px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20 transition-colors"
+                          className="w-full flex items-center gap-2 outline-none cursor-pointer rounded-xl px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20 transition-colors mt-1 border-t border-warm-100 dark:border-charcoal-800"
                         >
                           <LogOut className="w-4 h-4" />
                           Log out
