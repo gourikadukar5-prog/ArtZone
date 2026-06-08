@@ -9,8 +9,10 @@ import {
   Eye, TrendingUp, Users, MessageSquare, BellRing,
   ChevronRight, LogOut, Activity,
   PieChart as PieChartIcon, Award, Shield, Palette,
-  Bell, Lock, AlertTriangle, X, Check, UserPlus, UserCheck, Camera, Loader2
+  Bell, Lock, AlertTriangle, X, Check, UserPlus, UserCheck, Camera, Loader2,
+  Home, Compass, Grid3X3, PlusSquare, MessageCircle, User
 } from "lucide-react";
+import Masonry from "react-masonry-css";
 import { formatNumber, cn } from "@/lib/utils";
 import { useArtStore } from "@/lib/store";
 import { fetchArtworks, deleteArtwork, ArtworkDB } from "@/lib/artworks";
@@ -31,13 +33,16 @@ import {
 
 // ─── SIDEBAR ─────────────────────────────────────────────────
 const SIDEBAR_ITEMS = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "artworks", label: "My Artworks", icon: ImageIcon },
-  { id: "collections", label: "Collections", icon: FolderHeart },
-  { id: "saved", label: "Saved", icon: Heart },
-  { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "community", label: "Community", icon: Users },
-  { id: "settings", label: "Settings", icon: Settings },
+  { id: "overview", label: "Home", icon: Home, type: "tab" },
+  { id: "collections", label: "Explore", icon: Compass, type: "tab" },
+  { id: "artworks", label: "Gallery", icon: Grid3X3, type: "tab" },
+  { id: "upload", label: "Upload", icon: PlusSquare, type: "link", href: "/upload" },
+  { id: "saved", label: "Saved", icon: Heart, type: "tab" },
+  { id: "analytics", label: "Analytics", icon: BarChart3, type: "tab" },
+  { id: "notifications", label: "Notifications", icon: Bell, type: "tab" },
+  { id: "community", label: "Messages", icon: MessageCircle, type: "tab" },
+  { id: "profile", label: "Profile", icon: User, type: "action", action: "profile" },
+  { id: "settings", label: "Settings", icon: Settings, type: "tab" },
 ];
 
 const SETTINGS_CATEGORIES = [
@@ -349,46 +354,70 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-transparent pt-[var(--nav-height)] flex relative z-10">
 
       {/* ── SIDEBAR ── */}
-      <aside className="w-64 fixed top-[var(--nav-height)] bottom-0 left-0 border-r border-white/20 dark:border-white/10 bg-white/40 dark:bg-charcoal-950/60 backdrop-blur-2xl hidden lg:flex flex-col py-8 z-10 overflow-y-auto custom-scrollbar">
-        <div className="px-6 flex flex-col items-center mb-8 pb-8 border-b border-white/20 dark:border-white/10">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-accent-terracotta to-[#D4A853] p-1 mb-4 shadow-lg">
-            <div className="w-full h-full rounded-full bg-white dark:bg-charcoal-900 flex items-center justify-center overflow-hidden border-2 border-white dark:border-charcoal-900">
-              {avatarUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
-              ) : user?.user_metadata?.avatar_url ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-3xl font-display text-charcoal-900 dark:text-warm-100">{userName.charAt(0).toUpperCase()}</span>
-              )}
-            </div>
-          </div>
-          <h2 className="font-sans font-light tracking-wide text-lg text-charcoal-900 dark:text-warm-100 mb-1 text-center">{userName}</h2>
-          <p className="font-sans font-light tracking-wide text-sm text-charcoal-500 dark:text-charcoal-400 mb-2 text-center">{followerCount} Followers</p>
-          <button onClick={() => { setActiveTab("settings"); setActiveSettingsTab("profile"); }} className="px-5 py-2 rounded-full bg-white/60 dark:bg-charcoal-800/60 hover:bg-white dark:hover:bg-charcoal-700 border border-white/40 dark:border-white/10 text-sm font-medium text-charcoal-900 dark:text-warm-100 transition-colors shadow-sm w-full">
-            Edit Profile
+      <aside className="w-20 fixed top-[var(--nav-height)] bottom-0 left-0 border-r border-white/20 dark:border-white/10 bg-white/40 dark:bg-charcoal-950/60 backdrop-blur-2xl hidden lg:flex flex-col items-center py-6 z-10 overflow-y-auto custom-scrollbar">
+        {/* Profile Avatar Top */}
+        <div className="mb-6 pb-6 border-b border-white/20 dark:border-white/10 w-full flex justify-center">
+          <button 
+            onClick={() => { setActiveTab("settings"); setActiveSettingsTab("profile"); }}
+            className="w-12 h-12 rounded-full overflow-hidden border-2 border-white dark:border-charcoal-900 shadow-md hover:ring-2 hover:ring-accent-terracotta transition-all"
+            title="Profile"
+          >
+            {avatarUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+            ) : user?.user_metadata?.avatar_url ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-tr from-accent-terracotta to-[#D4A853] flex items-center justify-center text-white font-display text-lg">
+                {userName.charAt(0).toUpperCase()}
+              </div>
+            )}
           </button>
         </div>
-        <div className="flex-1 space-y-1.5 px-4">
-          <p className="font-sans font-light tracking-wide text-sm font-semibold uppercase tracking-wider text-charcoal-400 dark:text-charcoal-500 mb-4 pl-4">Menu</p>
-          {SIDEBAR_ITEMS.map(item => (
-            <button key={item.id} onClick={() => setActiveTab(item.id)} className={cn("w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-sans font-light tracking-wide text-lg font-medium transition-all duration-300 relative group", activeTab === item.id ? "bg-white/80 text-charcoal-900 dark:bg-charcoal-800/80 dark:text-warm-100 shadow-sm" : "text-charcoal-600 dark:text-charcoal-400 hover:bg-white/50 dark:hover:bg-charcoal-800/50 hover:text-charcoal-900 dark:hover:text-warm-100")}>
-              {activeTab === item.id && (
-                <motion.div layoutId="activeSidebarIndicator" className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-accent-terracotta dark:bg-[#D4A853] rounded-r-full" />
-              )}
-              <item.icon className={cn("w-5 h-5 transition-transform duration-300 group-hover:scale-110", activeTab === item.id ? "text-accent-terracotta dark:text-[#D4A853]" : "opacity-70")} />
-              {item.label}
-            </button>
-          ))}
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all duration-300 mt-8">
-            <LogOut className="w-5 h-5 opacity-70" /> <span className="font-sans font-light tracking-wide text-lg">Logout</span>
+
+        <div className="flex-1 space-y-4 w-full flex flex-col items-center">
+          {SIDEBAR_ITEMS.map(item => {
+            const isActive = activeTab === item.id || (item.type === 'action' && item.action === 'profile' && activeTab === 'settings' && activeSettingsTab === 'profile');
+            return (
+              <button 
+                key={item.id} 
+                onClick={() => {
+                  if (item.type === "link" && item.href) router.push(item.href);
+                  else if (item.type === "action" && item.action === "profile") {
+                    setActiveTab("settings");
+                    setActiveSettingsTab("profile");
+                  } else {
+                    setActiveTab(item.id);
+                  }
+                }} 
+                className={cn(
+                  "w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 relative group", 
+                  isActive ? "bg-charcoal-900 text-white dark:bg-warm-100 dark:text-charcoal-900 shadow-md" : "text-charcoal-600 dark:text-charcoal-400 hover:bg-white/60 dark:hover:bg-charcoal-800 hover:text-charcoal-900 dark:hover:text-warm-100"
+                )}
+              >
+                <item.icon className={cn("w-6 h-6 transition-transform duration-300", isActive ? "" : "group-hover:scale-110")} />
+                {/* Tooltip */}
+                <span className="absolute left-16 px-3 py-1.5 bg-charcoal-900 dark:bg-white text-white dark:text-charcoal-900 text-sm font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 shadow-xl whitespace-nowrap z-50">
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-white/20 dark:border-white/10 w-full flex justify-center">
+          <button className="w-12 h-12 flex items-center justify-center rounded-full text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all duration-300 relative group">
+            <LogOut className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <span className="absolute left-16 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 shadow-xl whitespace-nowrap z-50">
+              Logout
+            </span>
           </button>
         </div>
       </aside>
 
       {/* ── MAIN ── */}
-      <main className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-8 xl:p-10 w-full overflow-x-hidden">
+      <main className="flex-1 lg:ml-20 p-4 sm:p-6 lg:p-8 xl:p-10 w-full overflow-x-hidden">
         <div className="max-w-screen-2xl mx-auto space-y-8 pb-20">
 
           {/* Header */}
@@ -503,11 +532,15 @@ export default function DashboardPage() {
                     action={<button onClick={() => setActiveTab("artworks")} className="text-sm font-semibold text-accent-terracotta dark:text-[#D4A853] hover:underline">View All</button>}
                   />
                   {myArtworks.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <Masonry
+                      breakpointCols={{ default: 4, 1536: 5, 1280: 4, 1024: 3, 768: 2, 640: 1 }}
+                      className="flex w-auto gap-4"
+                      columnClassName="bg-clip-padding flex flex-col gap-4"
+                    >
                       {myArtworks.slice(0, 5).map(art => (
                         <ArtworkCard key={art.id} art={art} showDelete onDelete={() => handleDeleteArtwork(art.id, art.image_url)} />
                       ))}
-                    </div>
+                    </Masonry>
                   ) : (
                     <EmptyState icon={ImageIcon} title="No Artworks Yet" desc="Upload your first artwork to see it here." action={<Link href="/upload" className="btn-primary py-2 px-5 text-sm inline-flex items-center gap-2"><Plus className="w-4 h-4" />Upload Now</Link>} />
                   )}
@@ -589,11 +622,15 @@ export default function DashboardPage() {
                     action={<span className="font-display capitalize text-xl text-charcoal-500 dark:text-charcoal-400">{myArtworks.length} total</span>}
                   />
                   {myArtworks.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <Masonry
+                      breakpointCols={{ default: 4, 1536: 5, 1280: 4, 1024: 3, 768: 2, 640: 1 }}
+                      className="flex w-auto gap-4"
+                      columnClassName="bg-clip-padding flex flex-col gap-4"
+                    >
                       {myArtworks.map(art => (
                         <ArtworkCard key={art.id} art={art} showDelete onDelete={() => handleDeleteArtwork(art.id, art.image_url)} />
                       ))}
-                    </div>
+                    </Masonry>
                   ) : (
                     <EmptyState icon={ImageIcon} title="No Artworks Yet" desc="Start uploading your art to build your portfolio." action={<Link href="/upload" className="btn-primary py-2 px-5 text-sm inline-flex items-center gap-2"><Plus className="w-4 h-4" />Upload Your First Artwork</Link>} />
                   )}
@@ -681,11 +718,15 @@ export default function DashboardPage() {
                     action={<span className="font-display capitalize text-xl text-charcoal-500 dark:text-charcoal-400">{savedArtworks.length} saved</span>}
                   />
                   {savedArtworks.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <Masonry
+                      breakpointCols={{ default: 4, 1536: 5, 1280: 4, 1024: 3, 768: 2, 640: 1 }}
+                      className="flex w-auto gap-4"
+                      columnClassName="bg-clip-padding flex flex-col gap-4"
+                    >
                       {savedArtworks.map(art => (
                         <SavedCard key={art.id} art={art} onUnsave={() => handleUnsave(art.id)} />
                       ))}
-                    </div>
+                    </Masonry>
                   ) : (
                     <EmptyState icon={Heart} title="No Saved Artworks" desc="Browse the gallery and save artworks you love." action={<Link href="/gallery" className="btn-primary py-2 px-5 text-sm inline-flex items-center gap-2"><Eye className="w-4 h-4" />Browse Gallery</Link>} />
                   )}
