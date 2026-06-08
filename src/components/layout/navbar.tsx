@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
-import { Search, Menu, X, Bell, User, Sun, Moon, LogIn, LogOut, LayoutDashboard, Image as ImageIcon, ChevronDown } from "lucide-react";
+import { Search, Menu, X, Bell, User, Sun, Moon, LogIn, LogOut, LayoutDashboard, Image as ImageIcon, ChevronDown, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Pacifico, Lilita_One } from "next/font/google";
 import { useArtStore } from "@/lib/store";
