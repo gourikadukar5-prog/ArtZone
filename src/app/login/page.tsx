@@ -42,15 +42,24 @@ function LoginContent() {
     setLoading(true);
     const supabase = createClient();
 
-    console.log("[Login] Attempting signInWithPassword for:", email);
+    console.log("[Login] ── Starting login ──────────────────────────");
+    console.log("[Login] Email:", email.trim());
+    console.log("[Login] Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
 
     const { data, error: signInError } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
     });
 
+    console.log("[Login] RAW data:", JSON.stringify(data, null, 2));
+    console.log("[Login] RAW error:", JSON.stringify(signInError, null, 2));
+
     if (signInError) {
-      console.error("[Login] signInWithPassword error:", signInError.message, signInError);
+      console.error("[Login] signInWithPassword error details:", {
+        code: signInError.status || signInError.code,
+        message: signInError.message,
+        name: signInError.name
+      });
       // Surface exact Supabase error to the user
       if (signInError.message === "Invalid login credentials") {
         setError("Incorrect email or password. Please try again.");
