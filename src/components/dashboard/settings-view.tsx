@@ -414,6 +414,8 @@ export function SettingsView({ activeTab, profile, user, onProfileUpdate }: Sett
         );
 
       default:
+        return null;
+    }
   };
 
   return (
