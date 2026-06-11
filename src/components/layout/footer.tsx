@@ -48,7 +48,7 @@ export function Footer() {
             </p>
             
             <div className="flex items-center gap-3">
-              <a href="#" className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/30 transition-all duration-300">
+              <a href="https://www.instagram.com/gk_artgallery25?igsh=MnFmcm9ua3V1bG5o" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/30 transition-all duration-300">
                 <Instagram className="w-4 h-4" />
               </a>
               <a href="#" className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/30 transition-all duration-300">
@@ -57,7 +57,7 @@ export function Footer() {
               <a href="#" className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/30 transition-all duration-300">
                 <Twitter className="w-4 h-4" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/30 transition-all duration-300 font-serif italic font-bold">
+              <a href="https://pin.it/6kb2grcWQ" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/30 transition-all duration-300 font-serif italic font-bold">
                 P
               </a>
             </div>
