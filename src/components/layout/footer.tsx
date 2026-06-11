@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Instagram, Twitter, Facebook, Sparkles } from "lucide-react";
+import { Instagram, Twitter, Sparkles } from "lucide-react";
 import { Pacifico, Lilita_One } from "next/font/google";
 
 const pacifico = Pacifico({ weight: "400", subsets: ["latin"] });
@@ -50,9 +50,6 @@ export function Footer() {
             <div className="flex items-center gap-3">
               <a href="https://www.instagram.com/gk_artgallery25?igsh=MnFmcm9ua3V1bG5o" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/30 transition-all duration-300">
                 <Instagram className="w-4 h-4" />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/30 transition-all duration-300">
-                <Facebook className="w-4 h-4" />
               </a>
               <a href="#" className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/30 transition-all duration-300">
                 <Twitter className="w-4 h-4" />
