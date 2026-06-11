@@ -314,12 +314,13 @@ function DashboardInner() {
         setAvatarUploading(false);
       }
 
-      const ok = await upsertProfile({ id: user.id, ...profileForm, avatar_url: finalAvatarUrl || undefined });
-      if (ok) {
+      const { success, error } = await upsertProfile({ id: user.id, ...profileForm, avatar_url: finalAvatarUrl || undefined });
+      if (success) {
         setProfileSaved(true);
-        setTimeout(() => setProfileSaved(false), 2500);
+        setTimeout(() => setProfileSaved(false), 3000);
+        await loadData();
       } else {
-        setProfileError("Failed to update profile. Please try again.");
+        setProfileError(error || "Failed to update profile");
       }
     } catch (err: unknown) {
       setProfileError(err instanceof Error ? err.message : "Failed to update profile.");

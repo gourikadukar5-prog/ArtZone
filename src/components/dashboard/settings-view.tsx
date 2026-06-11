@@ -90,16 +90,16 @@ export function SettingsView({ activeTab, profile, user, onProfileUpdate }: Sett
     setError(null);
     setSuccess(null);
 
-    const success = await upsertProfile({
+    const { success: ok, error: errorMsg } = await upsertProfile({
       id: profile.id,
       ...updates,
     });
 
-    if (success) {
+    if (ok) {
       setSuccess("Settings saved successfully.");
       onProfileUpdate();
     } else {
-      setError("Failed to save settings.");
+      setError(errorMsg || "Failed to save settings.");
     }
     setLoading(false);
     setTimeout(() => setSuccess(null), 3000);

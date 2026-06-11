@@ -373,16 +373,20 @@ export async function fetchProfile(userId: string): Promise<Profile | null> {
   return data;
 }
 
-export async function upsertProfile(profile: Partial<Profile> & { id: string }): Promise<boolean> {
+export async function upsertProfile(profile: Partial<Profile> & { id: string }): Promise<{ success: boolean; error?: string }> {
   const supabase = createClient();
   const payload: Record<string, unknown> = {
     ...profile,
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await supabase.from("profiles").upsert([payload]);
-  if (error) { console.error("upsertProfile:", error.message); return false; }
-  return true;
+  const { error } = await supabase.from("profiles").update(payload).eq("id", profile.id);
+  if (error) { 
+    console.error("upsertProfile error object:", error); 
+    const errorMessage = error.message || error.details || error.hint || JSON.stringify(error);
+    return { success: false, error: errorMessage }; 
+  }
+  return { success: true };
 }
 
 // ─── Community: All Artists ───────────────────────────────────
