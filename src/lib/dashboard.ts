@@ -377,7 +377,6 @@ export async function upsertProfile(profile: Partial<Profile> & { id: string }):
   const supabase = createClient();
   const payload: Record<string, unknown> = {
     ...profile,
-    updated_at: new Date().toISOString(),
   };
 
   const { error } = await supabase.from("profiles").update(payload).eq("id", profile.id);
