@@ -34,6 +34,14 @@ export interface Profile {
   username: string;
   bio: string;
   avatar_url: string;
+  notify_followers?: boolean;
+  notify_likes?: boolean;
+  notify_comments?: boolean;
+  is_public?: boolean;
+  show_followers_count?: boolean;
+  instagram_url?: string;
+  pinterest_url?: string;
+  portfolio_url?: string;
 }
 
 export interface ArtistWithFollow {
@@ -93,6 +101,8 @@ export async function createCollection(payload: {
   if (error) { console.error("createCollection:", error.message); return null; }
   return data;
 }
+
+
 
 export async function deleteCollection(collectionId: string, userId: string): Promise<boolean> {
   const supabase = createClient();
@@ -362,17 +372,11 @@ export async function fetchProfile(userId: string): Promise<Profile | null> {
 
 export async function upsertProfile(profile: Partial<Profile> & { id: string }): Promise<boolean> {
   const supabase = createClient();
-  // Build payload — always include avatar_url even if null so it is written explicitly
   const payload: Record<string, unknown> = {
-    id: profile.id,
-    display_name: profile.display_name ?? "",
-    username: profile.username ?? "",
-    bio: profile.bio ?? "",
+    ...profile,
+    updated_at: new Date().toISOString(),
   };
-  // Only include avatar_url when it is explicitly provided in the argument
-  if ("avatar_url" in profile) {
-    payload.avatar_url = profile.avatar_url ?? null;
-  }
+
   const { error } = await supabase.from("profiles").upsert([payload]);
   if (error) { console.error("upsertProfile:", error.message); return false; }
   return true;

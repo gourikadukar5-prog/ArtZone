@@ -11,12 +11,13 @@ import {
   ChevronRight, LogOut, Activity,
   PieChart as PieChartIcon, Award, Shield, Palette,
   Bell, Lock, AlertTriangle, X, Check, UserPlus, UserCheck, Camera, Loader2,
-  Home, Compass, Grid3X3, PlusSquare, MessageCircle, User
+  Home, Compass, Grid3X3, PlusSquare, MessageCircle, User, Globe
 } from "lucide-react";
 import Masonry from "react-masonry-css";
 import { formatNumber, cn } from "@/lib/utils";
 import { useArtStore } from "@/lib/store";
 import { fetchArtworks, deleteArtwork, ArtworkDB } from "@/lib/artworks";
+import { SettingsView } from "@/components/dashboard/settings-view";
 import {
   fetchCollections, createCollection, deleteCollection,
   fetchSavedArtworks, unsaveArtwork,
@@ -45,11 +46,12 @@ const SIDEBAR_ITEMS = [
 ];
 
 const SETTINGS_CATEGORIES = [
+  { id: "security", label: "Account & Security", icon: Shield },
+  { id: "social", label: "Social Links", icon: Globe },
   { id: "appearance", label: "Appearance", icon: Palette },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "privacy", label: "Privacy", icon: Lock },
   { id: "artwork", label: "Artwork Preferences", icon: ImageIcon },
-  { id: "security", label: "Account & Security", icon: Shield },
   { id: "danger", label: "Danger Zone", icon: AlertTriangle, danger: true },
 ];
 
@@ -137,7 +139,7 @@ function DashboardInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("overview");
-  const [activeSettingsTab, setActiveSettingsTab] = useState("appearance");
+  const [activeSettingsTab, setActiveSettingsTab] = useState("security");
   const [mounted, setMounted] = useState(false);
 
   // Data states
@@ -957,14 +959,13 @@ function DashboardInner() {
                   </div>
                 </GlassCard>
 
-                <div className="lg:col-span-3 space-y-6">
-                  <GlassCard className="p-8 min-h-[400px] flex flex-col items-center justify-center text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-white/50 dark:bg-charcoal-800/50 flex items-center justify-center mb-4">
-                      <Settings className="w-8 h-8 text-charcoal-400 dark:text-charcoal-500" />
-                    </div>
-                    <h3 className="font-sans font-light tracking-wide text-3xl text-charcoal-900 dark:text-warm-100 mb-2 capitalize">{activeSettingsTab} Settings</h3>
-                    <p className="font-sans font-light tracking-wide text-xl text-charcoal-500 dark:text-charcoal-400 max-w-sm">This section is coming soon.</p>
-                  </GlassCard>
+                <div className="lg:col-span-3">
+                  <SettingsView 
+                    activeTab={activeSettingsTab} 
+                    profile={profile} 
+                    user={user} 
+                    onProfileUpdate={loadData} 
+                  />
                 </div>
               </motion.div>
             )}

@@ -1,5 +1,4 @@
--- Enable row level security on storage.objects (if not already enabled)
-alter table storage.objects enable row level security;
+-- 0. Row level security is already enabled by default on storage.objects.
 
 -- Drop existing policies if any to avoid conflicts
 drop policy if exists "Profile images are publicly accessible." on storage.objects;
