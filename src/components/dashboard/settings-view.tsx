@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { 
   Shield, Globe, Bell, Lock, AlertTriangle, Loader2, Check, X 
 } from "lucide-react";
@@ -51,7 +52,12 @@ export function SettingsView({ activeTab, profile, user, onProfileUpdate }: Sett
     portfolio_url: "",
     email: user?.email || "",
     password: "",
+    theme_mode: "system",
+    preferred_category: "All",
+    feed_preference: "latest",
   });
+
+  const { theme, setTheme } = useTheme();
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
@@ -67,7 +73,14 @@ export function SettingsView({ activeTab, profile, user, onProfileUpdate }: Sett
         instagram_url: profile.instagram_url ?? "",
         pinterest_url: profile.pinterest_url ?? "",
         portfolio_url: profile.portfolio_url ?? "",
+        theme_mode: profile.theme_mode ?? "system",
+        preferred_category: profile.preferred_category ?? "All",
+        feed_preference: profile.feed_preference ?? "latest",
       }));
+      // Sync loaded theme with NextThemes if necessary
+      if (profile.theme_mode && profile.theme_mode !== theme) {
+        setTheme(profile.theme_mode);
+      }
     }
   }, [profile]);
 
@@ -323,18 +336,84 @@ export function SettingsView({ activeTab, profile, user, onProfileUpdate }: Sett
         );
 
       case "appearance":
-      case "artwork":
-      default:
         return (
-          <GlassCard className="p-8 min-h-[400px] flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 rounded-2xl bg-white/50 dark:bg-charcoal-800/50 flex items-center justify-center mb-4">
-              <Palette className="w-8 h-8 text-charcoal-400 dark:text-charcoal-500" />
+          <GlassCard className="p-8">
+            <h3 className="font-sans font-light tracking-wide text-2xl mb-6 flex items-center gap-2">
+              <Palette className="w-6 h-6 text-accent-terracotta dark:text-[#D4A853]" /> Appearance
+            </h3>
+            <div className="space-y-6">
+              <div>
+                <label className="text-sm font-medium mb-2 block text-charcoal-700 dark:text-charcoal-300">Theme Mode</label>
+                <div className="flex gap-3">
+                  {["light", "dark", "system"].map(mode => (
+                    <button
+                      key={mode}
+                      onClick={() => {
+                        setForm(p => ({ ...p, theme_mode: mode }));
+                        setTheme(mode);
+                        saveProfileSettings({ theme_mode: mode });
+                      }}
+                      className={cn(
+                        "flex-1 py-3 px-4 rounded-xl border text-sm font-medium capitalize transition-all",
+                        form.theme_mode === mode 
+                          ? "border-accent-terracotta bg-accent-terracotta/10 text-accent-terracotta dark:border-[#D4A853] dark:bg-[#D4A853]/10 dark:text-[#D4A853]" 
+                          : "border-charcoal-200 dark:border-charcoal-800 text-charcoal-600 dark:text-charcoal-400 hover:bg-white/50 dark:hover:bg-charcoal-800"
+                      )}
+                    >
+                      {mode}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-            <h3 className="font-sans font-light tracking-wide text-3xl text-charcoal-900 dark:text-warm-100 mb-2 capitalize">{activeTab} Settings</h3>
-            <p className="font-sans font-light tracking-wide text-xl text-charcoal-500 dark:text-charcoal-400 max-w-sm">This section is coming soon.</p>
           </GlassCard>
         );
-    }
+
+      case "artwork":
+        return (
+          <GlassCard className="p-8">
+            <h3 className="font-sans font-light tracking-wide text-2xl mb-6 flex items-center gap-2">
+              <ImageIcon className="w-6 h-6 text-accent-terracotta dark:text-[#D4A853]" /> Artwork Preferences
+            </h3>
+            <div className="space-y-6">
+              <div>
+                <label className="text-sm font-medium mb-2 block text-charcoal-700 dark:text-charcoal-300">Preferred Art Category</label>
+                <select
+                  value={form.preferred_category}
+                  onChange={e => {
+                    setForm(p => ({ ...p, preferred_category: e.target.value }));
+                    saveProfileSettings({ preferred_category: e.target.value });
+                  }}
+                  className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-charcoal-900/50 border border-charcoal-200 dark:border-charcoal-800 focus:outline-none focus:ring-2 focus:ring-accent-terracotta"
+                >
+                  <option value="All">All Categories</option>
+                  <option value="Pencil Art">Pencil Art</option>
+                  <option value="Mandala Art">Mandala Art</option>
+                  <option value="Painting">Painting</option>
+                  <option value="Digital Art">Digital Art</option>
+                  <option value="Sketches">Sketches</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block text-charcoal-700 dark:text-charcoal-300">Feed Preference</label>
+                <select
+                  value={form.feed_preference}
+                  onChange={e => {
+                    setForm(p => ({ ...p, feed_preference: e.target.value }));
+                    saveProfileSettings({ feed_preference: e.target.value });
+                  }}
+                  className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-charcoal-900/50 border border-charcoal-200 dark:border-charcoal-800 focus:outline-none focus:ring-2 focus:ring-accent-terracotta"
+                >
+                  <option value="latest">Latest Artworks First</option>
+                  <option value="trending">Trending Artworks First</option>
+                </select>
+              </div>
+            </div>
+          </GlassCard>
+        );
+
+      default:
   };
 
   return (

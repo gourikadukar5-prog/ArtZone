@@ -42,6 +42,9 @@ export interface Profile {
   instagram_url?: string;
   pinterest_url?: string;
   portfolio_url?: string;
+  theme_mode?: string;
+  preferred_category?: string;
+  feed_preference?: string;
 }
 
 export interface ArtistWithFollow {
