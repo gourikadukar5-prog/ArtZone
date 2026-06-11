@@ -7,6 +7,7 @@ import Masonry from "react-masonry-css";
 import { ArrowRight, Heart, Bookmark, UploadCloud, Users, Sparkles, Image as ImageIcon } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
 import { useArtStore } from "@/lib/store";
+import { useRouter } from "next/navigation";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -50,14 +51,15 @@ const EXPLORE_CATEGORIES = [
 ];
 
 const FEATURES = [
-  { icon: UploadCloud, title: "High Quality Uploads", desc: "Share your art in stunning uncompressed resolution." },
-  { icon: Users, title: "Discover Artists", desc: "Connect with thousands of talented creators globally." },
-  { icon: Bookmark, title: "Save Favorite Arts", desc: "Curate personal collections of pieces that inspire you." },
-  { icon: Sparkles, title: "Creative Community", desc: "Engage, learn, and grow in a supportive environment." },
+  { icon: UploadCloud, title: "High Quality Uploads", desc: "Upload your artwork in high quality while preserving original details and resolution.", action: "upload" },
+  { icon: Users, title: "Discover Artists", desc: "Explore talented artists, discover new styles, and connect with creative creators.", action: "discover" },
+  { icon: Bookmark, title: "Save Favorite Arts", desc: "Save artworks you love and build your personal collection for future inspiration.", action: "save" },
+  { icon: Sparkles, title: "Creative Community", desc: "Engage with artists, share feedback, and become part of a growing creative community.", action: "community" },
 ];
 
 export default function HomePage() {
-  const artworks = useArtStore((state) => state.artworks);
+  const { artworks, isAuthenticated } = useArtStore();
+  const router = useRouter();
   
   const breakpointColumnsObj = {
     default: 4,
@@ -208,12 +210,26 @@ export default function HomePage() {
       <AnimatedSection className="section container-wide py-24">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {FEATURES.map((feature, i) => (
-            <motion.div key={feature.title} variants={fadeUp} custom={i} className="p-8 rounded-3xl bg-white dark:bg-charcoal-900 border border-warm-200 dark:border-charcoal-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-400 group">
-              <div className="w-12 h-12 rounded-xl bg-warm-100 dark:bg-charcoal-800 flex items-center justify-center mb-6 group-hover:bg-charcoal-900 group-hover:text-white dark:group-hover:bg-warm-100 dark:group-hover:text-charcoal-900 transition-colors duration-400">
+            <motion.div 
+              key={feature.title} 
+              variants={fadeUp} 
+              custom={i} 
+              onClick={() => {
+                if (feature.action === "upload") router.push("/upload");
+                if (feature.action === "discover") router.push("/gallery");
+                if (feature.action === "save") {
+                  if (isAuthenticated) router.push("/dashboard?tab=saved");
+                  else router.push("/login?next=/dashboard?tab=saved");
+                }
+                if (feature.action === "community") router.push("/dashboard?tab=community");
+              }}
+              className="p-8 rounded-3xl bg-white dark:bg-charcoal-900 border border-warm-200 dark:border-charcoal-800 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group cursor-pointer flex flex-col h-full"
+            >
+              <div className="w-12 h-12 rounded-xl bg-warm-100 dark:bg-charcoal-800 flex items-center justify-center mb-6 group-hover:bg-charcoal-900 group-hover:text-white dark:group-hover:bg-warm-100 dark:group-hover:text-charcoal-900 transition-colors duration-300">
                 <feature.icon className="w-6 h-6 text-charcoal-600 dark:text-charcoal-400 group-hover:text-white dark:group-hover:text-charcoal-900 transition-colors" />
               </div>
               <h3 className="font-display font-medium text-xl mb-3 dark:text-warm-100">{feature.title}</h3>
-              <p className="text-charcoal-500 dark:text-charcoal-400 text-sm leading-relaxed">{feature.desc}</p>
+              <p className="text-charcoal-500 dark:text-charcoal-400 text-sm leading-relaxed flex-grow">{feature.desc}</p>
             </motion.div>
           ))}
         </div>
