@@ -1,13 +1,42 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Masonry from "react-masonry-css";
 import { Heart, Bookmark, Search, ArrowLeft } from "lucide-react";
 import { useArtStore } from "@/lib/store";
 import { formatNumber } from "@/lib/utils";
+import GalleryModal from "@/components/gallery/GalleryModal";
+
+import { trendingArts } from "@/galleryData/trendingArts";
+import { traditionalArts } from "@/galleryData/traditionalArts";
+import { digitalArts } from "@/galleryData/digitalArts";
+import { animeSketches } from "@/galleryData/animeSketches";
+import { mandalaDesigns } from "@/galleryData/mandalaDesigns";
+import { creativePortraits } from "@/galleryData/creativePortraits";
+
+const ALL_STATIC_ARTWORKS = [
+  ...trendingArts,
+  ...traditionalArts,
+  ...digitalArts,
+  ...animeSketches,
+  ...mandalaDesigns,
+  ...creativePortraits,
+].map((art) => ({
+  id: `static-${art.id}`,
+  title: art.title,
+  artist: { name: art.artist },
+  category: art.category,
+  description: art.description,
+  imageUrl: art.image,
+  likes: art.likes,
+  views: art.views,
+  year: art.year,
+  style: art.style,
+  isStatic: true,
+}));
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -30,17 +59,32 @@ function SearchResults() {
   const query = searchParams.get("q") || "";
   const artworks = useArtStore((state) => state.artworks);
 
+  const combinedArtworks = [...artworks, ...ALL_STATIC_ARTWORKS];
+
   const filtered = query.trim()
-    ? artworks.filter((art) => {
+    ? combinedArtworks.filter((art) => {
         const q = query.toLowerCase();
+        const styleStr = 'style' in art ? (art as any).style : "";
+        const descStr = art.description || "";
+        
         return (
           art.title.toLowerCase().includes(q) ||
-          art.description.toLowerCase().includes(q) ||
+          descStr.toLowerCase().includes(q) ||
           art.category.toLowerCase().includes(q) ||
+          styleStr.toLowerCase().includes(q) ||
           art.artist.name.toLowerCase().includes(q)
         );
       })
-    : artworks;
+    : combinedArtworks;
+
+  // Modal State
+  const [modalIndex, setModalIndex] = useState(-1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCardClick = (index: number) => {
+    setModalIndex(index);
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen pt-28 pb-16 px-4 bg-transparent transition-colors duration-300">
@@ -138,7 +182,10 @@ function SearchResults() {
                 custom={i % 4}
                 className="mb-6"
               >
-                <div className="relative overflow-hidden rounded-2xl bg-warm-200 dark:bg-charcoal-800 shadow-sm group cursor-pointer">
+                <div 
+                  className="relative overflow-hidden rounded-2xl bg-warm-200 dark:bg-charcoal-800 shadow-sm group cursor-pointer"
+                  onClick={() => handleCardClick(i)}
+                >
                   <img
                     src={artwork.imageUrl}
                     alt={artwork.title}
@@ -183,6 +230,23 @@ function SearchResults() {
           </Masonry>
         )}
       </div>
+      <GalleryModal
+        artworks={filtered.map(a => ({
+          id: typeof a.id === "string" ? parseInt(a.id.replace("static-", "")) || 0 : a.id,
+          title: a.title,
+          artist: a.artist.name,
+          category: a.category,
+          description: a.description || "",
+          image: a.imageUrl,
+          likes: a.likes,
+          views: (a as any).views || 0,
+          year: (a as any).year || new Date().getFullYear(),
+          style: (a as any).style || a.category,
+        }))}
+        initialIndex={modalIndex}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

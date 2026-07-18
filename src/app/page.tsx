@@ -42,12 +42,12 @@ const HERO_CATEGORIES = [
 ];
 
 const EXPLORE_CATEGORIES = [
-  { name: "Trending Arts", img: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&q=80" },
-  { name: "Traditional Arts", img: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=600&q=80" },
-  { name: "Digital Arts", img: "https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=600&q=80" },
-  { name: "Anime Sketches", img: "https://images.unsplash.com/photo-1569172122301-bc5008bc09c5?w=600&q=80" },
-  { name: "Mandala Designs", img: "https://images.unsplash.com/photo-1549490349-8643362247b5?w=600&q=80" },
-  { name: "Creative Portraits", img: "https://images.unsplash.com/photo-1471666875520-c75081f42081?w=600&q=80" },
+  { name: "Trending Arts", slug: "trending-arts", img: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&q=80" },
+  { name: "Traditional Arts", slug: "traditional-arts", img: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=600&q=80" },
+  { name: "Digital Arts", slug: "digital-arts", img: "https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=600&q=80" },
+  { name: "Anime Sketches", slug: "anime-sketches", img: "https://images.unsplash.com/photo-1569172122301-bc5008bc09c5?w=600&q=80" },
+  { name: "Mandala Designs", slug: "mandala-designs", img: "https://images.unsplash.com/photo-1549490349-8643362247b5?w=600&q=80" },
+  { name: "Creative Portraits", slug: "creative-portraits", img: "https://images.unsplash.com/photo-1471666875520-c75081f42081?w=600&q=80" },
 ];
 
 const FEATURES = [
@@ -122,7 +122,13 @@ export default function HomePage() {
           
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
             {EXPLORE_CATEGORIES.map((cat, i) => (
-              <motion.div key={cat.name} variants={fadeUp} custom={i} className="group relative rounded-3xl overflow-hidden aspect-[4/3] shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer">
+              <motion.div 
+                key={cat.name} 
+                variants={fadeUp} 
+                custom={i} 
+                onClick={() => router.push(`/explore/${cat.slug}`)}
+                className="group relative rounded-3xl overflow-hidden aspect-[4/3] shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer"
+              >
                 <img src={cat.img} alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-charcoal-900/20 group-hover:bg-charcoal-900/40 transition-colors duration-500 flex items-center justify-center">
                   <h3 className="text-white font-display font-medium text-xl md:text-2xl tracking-wide">{cat.name}</h3>
